@@ -68,6 +68,12 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+Both `dev` and `start` run a small preflight (`scripts/ensure-port-free.sh`)
+that releases the app's port from any previous instance first — last command
+wins. This matters in managed environments (e.g. the v0 sandbox keeps `pnpm
+run dev` alive at boot, which would otherwise make `next start` crash with
+`EADDRINUSE`).
+
 ### Environment
 
 | Variable | Used by | Purpose |

@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "bash ../../scripts/ensure-port-free.sh 3000 && next dev --turbopack",
     "build": "next build",
-    "start": "next start",
+    "start": "bash ../../scripts/ensure-port-free.sh 3000 && next start",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
