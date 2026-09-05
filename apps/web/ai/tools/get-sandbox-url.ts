@@ -31,8 +31,12 @@ export const getSandboxURL = ({ writer }: Params) =>
       const sandbox = await Sandbox.get({ sandboxId })
       const url = sandbox.domain(port)
 
-      emitData(writer, toolCallId, 'get-sandbox-url', { url, status: 'done' })
+      emitData(writer, toolCallId, 'get-sandbox-url', {
+        url,
+        port,
+        status: 'done',
+      })
 
-      return { url }
+      return { url, port }
     },
   })

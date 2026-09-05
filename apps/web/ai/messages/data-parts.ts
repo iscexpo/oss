@@ -29,6 +29,7 @@ const runCommandSchema = z.object({
 
 const getSandboxUrlSchema = z.object({
   url: z.string().optional(),
+  port: z.number().optional(),
   status: z.enum(['loading', 'done']),
 })
 

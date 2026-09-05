@@ -14,11 +14,12 @@ interface SandboxStore {
   commands: Command[]
   generatedFiles: Set<string>
   paths: string[]
+  port?: number
   sandboxId?: string
   setChatStatus: (status: ChatStatus) => void
   setSandboxId: (id: string) => void
   setStatus: (status: 'running' | 'stopped') => void
-  setUrl: (url: string, uuid: string) => void
+  setUrl: (url: string, uuid: string, port?: number) => void
   status?: 'running' | 'stopped'
   upsertCommand: (command: Omit<Command, 'startedAt'>) => void
   url?: string
@@ -81,10 +82,11 @@ export const useSandboxStore = create<SandboxStore>()((set) => ({
       commands: [],
       paths: [],
       url: undefined,
+      port: undefined,
       generatedFiles: new Set<string>(),
     })),
   setStatus: (status) => set(() => ({ status })),
-  setUrl: (url, urlUUID) => set(() => ({ url, urlUUID })),
+  setUrl: (url, urlUUID, port) => set(() => ({ url, urlUUID, port })),
   upsertCommand: (cmd) => {
     set((state) => {
       const existingIdx = state.commands.findIndex((c) => c.cmdId === cmd.cmdId)
@@ -150,7 +152,7 @@ export function useDataStateMapper() {
         break
       case 'data-get-sandbox-url':
         if (data.data.url) {
-          setUrl(data.data.url, crypto.randomUUID())
+          setUrl(data.data.url, crypto.randomUUID(), data.data.port)
         }
         break
       default:

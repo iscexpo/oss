@@ -2,8 +2,10 @@ import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { ChatProvider } from '@/lib/chat-context'
 import { CommandLogsStream } from '@/components/commands-logs/commands-logs-stream'
 import { ErrorMonitor } from '@/components/error-monitor/error-monitor'
+import { PreviewOriginProvider } from '@/components/preview/preview-provider'
 import { SandboxState } from '@/components/modals/sandbox-state'
 import { Toaster } from '@/components/ui/sonner'
+import { getPreviewProxyUrl } from '@/lib/preview-proxy'
 import type { ReactNode } from 'react'
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
@@ -35,13 +37,19 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
+  const previewProxyUrl = getPreviewProxyUrl()
+
   return (
     <html lang="en">
       <body className="antialiased">
         <Suspense fallback={null}>
           <NuqsAdapter>
             <ChatProvider>
-              <ErrorMonitor>{children}</ErrorMonitor>
+              <ErrorMonitor>
+                <PreviewOriginProvider origin={previewProxyUrl}>
+                  {children}
+                </PreviewOriginProvider>
+              </ErrorMonitor>
             </ChatProvider>
           </NuqsAdapter>
         </Suspense>
