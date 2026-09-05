@@ -7,6 +7,7 @@ import {
   streamText,
 } from 'ai'
 import { DEFAULT_MODEL, MODEL_NAMES, SUPPORTED_MODELS } from '@/ai/constants'
+import { toModelMessages } from '@/ai/messages/model-messages'
 import { NextResponse } from 'next/server'
 import { getModelOptions } from '@/ai/gateway'
 import { checkBotId } from 'botid/server'
@@ -40,29 +41,9 @@ export async function POST(req: Request) {
       execute: async ({ writer }) => {
         const result = streamText({
           ...getModelOptions(modelId, { reasoningEffort }),
-          system: prompt,
-          messages: await convertToModelMessages(
-            messages.map((message) => {
-              message.parts = message.parts.map((part) => {
-                if (part.type === 'data-report-errors') {
-                  return {
-                    type: 'text',
-                    text:
-                      `There are errors in the generated code. This is the summary of the errors we have:\n` +
-                      `\`\`\`${part.data.summary}\`\`\`\n` +
-                      (part.data.paths?.length
-                        ? `The following files may contain errors:\n` +
-                          `\`\`\`${part.data.paths?.join('\n')}\`\`\`\n`
-                        : '') +
-                      `Fix the errors reported.`,
-                  }
-                }
-                return part
-              })
-              return message
-            })
-          ),
-          stopWhen: stepCountIs(20),
+system: prompt,
+            messages: await convertToModelMessages(toModelMessages(messages)),
+            stopWhen: stepCountIs(20),
           tools: tools({ modelId, writer }),
           onError: (error) => {
             console.error('Error communicating with AI')

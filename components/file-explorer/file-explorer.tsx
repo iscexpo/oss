@@ -5,12 +5,24 @@ import {
   ChevronDownIcon,
   FolderIcon,
   FileIcon,
+  Code2Icon,
+  Loader2Icon,
+  CopyIcon,
+  CheckIcon,
+  KeyRoundIcon,
 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { FileContent } from '@/components/file-explorer/file-content'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 import { Panel, PanelHeader } from '@/components/panels/panels'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { buildFileTree, type FileNode } from './build-file-tree'
 import { useState, useMemo, useEffect, useCallback, memo } from 'react'
+import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 
 interface Props {
@@ -29,10 +41,50 @@ export const FileExplorer = memo(function FileExplorer({
   const fileTree = useMemo(() => buildFileTree(paths), [paths])
   const [selected, setSelected] = useState<FileNode | null>(null)
   const [fs, setFs] = useState<FileNode[]>(fileTree)
+  const [vscode, setVscode] = useState<{ url: string; password: string } | null>(
+    null
+  )
+  const [vscodeLoading, setVscodeLoading] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     setFs(fileTree)
   }, [fileTree])
+
+  const openVSCode = useCallback(async () => {
+    if (!sandboxId || disabled || vscodeLoading) return
+    setVscodeLoading(true)
+    setCopied(false)
+    try {
+      const res = await fetch(`/api/sandboxes/${sandboxId}/vscode`, {
+        method: 'POST',
+      })
+      const data = await res.json().catch(() => null)
+      if (!res.ok || !data?.url) {
+        throw new Error(data?.error || 'Failed to open VS Code.')
+      }
+      setVscode({ url: data.url, password: data.password })
+      window.open(data.url, '_blank', 'noopener,noreferrer')
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : 'Failed to open VS Code.'
+      )
+    } finally {
+      setVscodeLoading(false)
+    }
+  }, [sandboxId, disabled, vscodeLoading])
+
+  const copyPassword = useCallback(async () => {
+    if (!vscode) return
+    try {
+      await navigator.clipboard.writeText(vscode.password)
+      setCopied(true)
+      toast.success('VS Code password copied.')
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      toast.error('Could not copy the password.')
+    }
+  }, [vscode])
 
   const toggleFolder = useCallback((path: string) => {
     setFs((prev) => {
@@ -80,9 +132,74 @@ export const FileExplorer = memo(function FileExplorer({
         <span className="font-mono uppercase font-semibold">
           Sandbox Remote Filesystem
         </span>
-        {selected && !disabled && (
-          <span className="ml-auto text-gray-500">{selected.path}</span>
-        )}
+        <span className="ml-auto flex items-center gap-2">
+          {selected && !disabled && (
+            <span className="text-gray-500 max-w-52 truncate">
+              {selected.path}
+            </span>
+          )}
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={disabled || !sandboxId || vscodeLoading}
+            onClick={openVSCode}
+            title="Open the sandbox file system in VS Code (code-server)"
+          >
+            {vscodeLoading ? (
+              <Loader2Icon className="w-3.5 animate-spin" />
+            ) : (
+              <Code2Icon className="w-3.5" />
+            )}
+            <span className="hidden sm:inline">
+              {vscodeLoading ? 'Starting…' : 'VS Code'}
+            </span>
+          </Button>
+          {vscode && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  title="Show VS Code password"
+                >
+                  <KeyRoundIcon className="w-3.5" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-72 space-y-2">
+                <p className="text-xs text-muted-foreground">
+                  VS Code opened in a new tab. Enter this password to sign in:
+                </p>
+                <div className="flex items-center gap-2">
+                  <code className="flex-1 rounded-sm bg-muted px-2 py-1 font-mono text-xs break-all">
+                    {vscode.password}
+                  </code>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 shrink-0"
+                    onClick={copyPassword}
+                    title="Copy password"
+                  >
+                    {copied ? (
+                      <CheckIcon className="w-3.5" />
+                    ) : (
+                      <CopyIcon className="w-3.5" />
+                    )}
+                    <span className="sr-only">Copy password</span>
+                  </Button>
+                </div>
+                <a
+                  className="block text-xs text-primary underline"
+                  href={vscode.url}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Open again
+                </a>
+              </PopoverContent>
+            </Popover>
+          )}
+        </span>
       </PanelHeader>
 
       <div className="flex text-sm h-[calc(100%-2rem-1px)]">

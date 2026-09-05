@@ -2,6 +2,7 @@ import type { DataPart } from '../../messages/data-parts'
 import type { File } from './get-contents'
 import type { Sandbox } from '@vercel/sandbox'
 import type { UIMessageStreamWriter, UIMessage } from 'ai'
+import { emitData } from '../emit-data'
 import { getRichError } from '../get-rich-error'
 
 interface Params {
@@ -17,10 +18,9 @@ export function getWriteFiles({ sandbox, toolCallId, writer }: Params) {
     paths: string[]
   }) {
     const paths = params.written.concat(params.files.map((file) => file.path))
-    writer.write({
-      id: toolCallId,
-      type: 'data-generating-files',
-      data: { paths, status: 'uploading' },
+    emitData(writer, toolCallId, 'generating-files', {
+      paths,
+      status: 'uploading',
     })
 
     try {
@@ -37,23 +37,18 @@ export function getWriteFiles({ sandbox, toolCallId, writer }: Params) {
         error,
       })
 
-      writer.write({
-        id: toolCallId,
-        type: 'data-generating-files',
-        data: {
-          error: richError.error,
-          status: 'error',
-          paths: params.paths,
-        },
+      emitData(writer, toolCallId, 'generating-files', {
+        error: richError.error,
+        status: 'error',
+        paths: params.paths,
       })
 
       return richError.message
     }
 
-    writer.write({
-      id: toolCallId,
-      type: 'data-generating-files',
-      data: { paths, status: 'uploaded' },
+    emitData(writer, toolCallId, 'generating-files', {
+      paths,
+      status: 'uploaded',
     })
   }
 }

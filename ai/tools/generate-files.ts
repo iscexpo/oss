@@ -1,6 +1,7 @@
 import type { UIMessageStreamWriter, UIMessage } from 'ai'
 import type { DataPart } from '../messages/data-parts'
 import { Sandbox } from '@vercel/sandbox'
+import { emitData } from './emit-data'
 import { getContents, type File } from './generate-files/get-contents'
 import { getRichError } from './get-rich-error'
 import { getWriteFiles } from './generate-files/get-write-files'
@@ -21,10 +22,9 @@ export const generateFiles = ({ writer, modelId }: Params) =>
       paths: z.array(z.string()),
     }),
     execute: async ({ sandboxId, paths }, { toolCallId, messages }) => {
-      writer.write({
-        id: toolCallId,
-        type: 'data-generating-files',
-        data: { paths: [], status: 'generating' },
+      emitData(writer, toolCallId, 'generating-files', {
+        paths: [],
+        status: 'generating',
       })
 
       let sandbox: Sandbox | null = null
@@ -38,10 +38,10 @@ export const generateFiles = ({ writer, modelId }: Params) =>
           error,
         })
 
-        writer.write({
-          id: toolCallId,
-          type: 'data-generating-files',
-          data: { error: richError.error, paths: [], status: 'error' },
+        emitData(writer, toolCallId, 'generating-files', {
+          error: richError.error,
+          paths: [],
+          status: 'error',
         })
 
         return richError.message
@@ -61,13 +61,9 @@ export const generateFiles = ({ writer, modelId }: Params) =>
               uploaded.push(...chunk.files)
             }
           } else {
-            writer.write({
-              id: toolCallId,
-              type: 'data-generating-files',
-              data: {
-                status: 'generating',
-                paths: chunk.paths,
-              },
+            emitData(writer, toolCallId, 'generating-files', {
+              status: 'generating',
+              paths: chunk.paths,
             })
           }
         }
@@ -78,23 +74,18 @@ export const generateFiles = ({ writer, modelId }: Params) =>
           error,
         })
 
-        writer.write({
-          id: toolCallId,
-          type: 'data-generating-files',
-          data: {
-            error: richError.error,
-            status: 'error',
-            paths,
-          },
+        emitData(writer, toolCallId, 'generating-files', {
+          error: richError.error,
+          status: 'error',
+          paths,
         })
 
         return richError.message
       }
 
-      writer.write({
-        id: toolCallId,
-        type: 'data-generating-files',
-        data: { paths: uploaded.map((file) => file.path), status: 'done' },
+      emitData(writer, toolCallId, 'generating-files', {
+        paths: uploaded.map((file) => file.path),
+        status: 'done',
       })
 
       return `Successfully generated and uploaded ${

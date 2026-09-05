@@ -1,4 +1,4 @@
-import { Models } from '@/ai/constants'
+import { DEFAULT_MODEL } from '@/ai/constants'
 import { NextResponse } from 'next/server'
 import { checkBotId } from 'botid/server'
 import { generateText, Output } from 'ai'
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   }
 
   const result = await generateText({
-    ...getModelOptions(Models.OpenAIGPT53Codex),
+    ...getModelOptions(DEFAULT_MODEL),
     system: prompt,
     messages: [{ role: 'user', content: JSON.stringify(parsedBody.data) }],
     output: Output.object({ schema: resultSchema }),

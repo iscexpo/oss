@@ -1,25 +1,24 @@
 import { Chat } from './chat'
 import { FileExplorer } from './file-explorer'
 import { Header } from './header'
-import { Horizontal, Vertical } from '@/components/layout/panels'
 import { Logs } from './logs'
 import { Preview } from './preview'
+import { Sidebar } from '@/components/layout/sidebar'
 import { TabContent, TabItem } from '@/components/tabs'
 import { Welcome } from '@/components/modals/welcome'
 import { cookies } from 'next/headers'
-import { getHorizontal, getVertical } from '@/components/layout/sizing'
 import { hideBanner } from '@/app/actions'
 
 export default async function Page() {
   const store = await cookies()
   const banner = store.get('banner-hidden')?.value !== 'true'
-  const horizontalSizes = getHorizontal(store)
-  const verticalSizes = getVertical(store)
   return (
     <>
       <Welcome defaultOpen={banner} onDismissAction={hideBanner} />
-      <div className="flex flex-col h-screen max-h-screen overflow-hidden p-2 space-x-2">
-        <Header className="flex items-center w-full" />
+      <div className="flex flex-col h-screen max-h-screen overflow-hidden p-2 space-y-2">
+        <Header className="flex items-center w-full shrink-0" />
+
+        {/* Mobile: top tab strip */}
         <ul className="flex space-x-5 font-mono text-sm tracking-tight px-1 py-2 md:hidden">
           <TabItem tabId="chat">Chat</TabItem>
           <TabItem tabId="preview">Preview</TabItem>
@@ -27,36 +26,57 @@ export default async function Page() {
           <TabItem tabId="logs">Logs</TabItem>
         </ul>
 
-        {/* Mobile layout tabs taking the whole space*/}
-        <div className="flex flex-1 w-full overflow-hidden pt-2 md:hidden">
-          <TabContent tabId="chat" className="flex-1">
+        {/* Mobile panels (one at a time, driven by ?tab= query) */}
+        <div className="flex flex-1 w-full overflow-hidden md:hidden">
+          <TabContent tabId="chat" className="flex-1 h-full overflow-hidden">
             <Chat className="flex-1 overflow-hidden" />
           </TabContent>
-          <TabContent tabId="preview" className="flex-1">
+          <TabContent
+            tabId="preview"
+            className="flex-1 h-full overflow-hidden"
+          >
             <Preview className="flex-1 overflow-hidden" />
           </TabContent>
-          <TabContent tabId="file-explorer" className="flex-1">
+          <TabContent
+            tabId="file-explorer"
+            className="flex-1 h-full overflow-hidden"
+          >
             <FileExplorer className="flex-1 overflow-hidden" />
           </TabContent>
-          <TabContent tabId="logs" className="flex-1">
+          <TabContent tabId="logs" className="flex-1 h-full overflow-hidden">
             <Logs className="flex-1 overflow-hidden" />
           </TabContent>
         </div>
 
-        {/* Desktop layout with horizontal and vertical panels */}
-        <div className="hidden flex-1 w-full min-h-0 overflow-hidden pt-2 md:flex">
-          <Horizontal
-            defaultLayout={horizontalSizes ?? [50, 50]}
-            left={<Chat className="flex-1 overflow-hidden" />}
-            right={
-              <Vertical
-                defaultLayout={verticalSizes ?? [33.33, 33.33, 33.33]}
-                top={<Preview className="flex-1 overflow-hidden" />}
-                middle={<FileExplorer className="flex-1 overflow-hidden" />}
-                bottom={<Logs className="flex-1 overflow-hidden" />}
-              />
-            }
-          />
+        {/* Desktop: left icon sidebar + full-width active panel */}
+        <div className="hidden md:flex flex-1 w-full min-h-0 overflow-hidden">
+          <Sidebar />
+          <div className="flex-1 min-h-0 overflow-hidden">
+            <TabContent
+              tabId="chat"
+              className="flex-1 h-full overflow-hidden"
+            >
+              <Chat className="flex-1 overflow-hidden" />
+            </TabContent>
+            <TabContent
+              tabId="preview"
+              className="flex-1 h-full overflow-hidden"
+            >
+              <Preview className="flex-1 overflow-hidden" />
+            </TabContent>
+            <TabContent
+              tabId="file-explorer"
+              className="flex-1 h-full overflow-hidden"
+            >
+              <FileExplorer className="flex-1 overflow-hidden" />
+            </TabContent>
+            <TabContent
+              tabId="logs"
+              className="flex-1 h-full overflow-hidden"
+            >
+              <Logs className="flex-1 overflow-hidden" />
+            </TabContent>
+          </div>
         </div>
       </div>
     </>

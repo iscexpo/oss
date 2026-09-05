@@ -10,6 +10,14 @@ const gateway = createOpenAI({
   apiKey: process.env.KILO_API_KEY,
 })
 
+export interface ModelConfig {
+  reasoningEffort?: 'low' | 'medium' | 'high'
+}
+
+const MODEL_CONFIGS: Record<string, ModelConfig> = {
+  [Models.OpenAIGPT53Codex]: { reasoningEffort: 'low' },
+}
+
 export interface ModelOptions {
   model: LanguageModelV3
   providerOptions?: Record<string, Record<string, JSONValue>>
@@ -20,18 +28,13 @@ export function getModelOptions(
   modelId: string,
   options?: { reasoningEffort?: 'low' | 'medium' | 'high' }
 ): ModelOptions {
-  if (modelId === Models.OpenAIGPT53Codex) {
-    return {
-      model: gateway.chat(modelId),
-      providerOptions: {
-        openai: {
-          reasoningEffort: options?.reasoningEffort ?? 'low',
-        },
-      },
-    }
-  }
+  const reasoningEffort =
+    options?.reasoningEffort ?? MODEL_CONFIGS[modelId]?.reasoningEffort
 
   return {
     model: gateway.chat(modelId),
+    ...(reasoningEffort
+      ? { providerOptions: { openai: { reasoningEffort } } }
+      : {}),
   }
 }

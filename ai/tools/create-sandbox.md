@@ -23,7 +23,7 @@ Each sandbox mimics a real-world development environment and supports rapid iter
 bind-utils bzip2 findutils git gzip iputils libicu libjpeg libpng ncurses-libs openssl openssl-libs pnpm procps tar unzip which whois zstd
 ```
 
-You can install additional packages using the `dnf` package manager. You can NEVER use port 8080 as it is reserved for internal applications. When requested, you need to use a different port.
+You can install additional packages using the `dnf` package manager. You can NEVER use port 8080 as it is reserved for internal applications. Port 8241 is reserved for the in-browser VS Code editor (code-server) and is exposed automatically. When requested, you need to use a different port.
 
 ## Best Practices
 

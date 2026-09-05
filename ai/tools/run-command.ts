@@ -1,6 +1,7 @@
 import type { UIMessageStreamWriter, UIMessage } from 'ai'
 import type { DataPart } from '../messages/data-parts'
 import { Command, Sandbox } from '@vercel/sandbox'
+import { emitData } from './emit-data'
 import { getRichError } from './get-rich-error'
 import { tool } from 'ai'
 import description from './run-command.md'
@@ -42,10 +43,11 @@ export const runCommand = ({ writer }: Params) =>
       { sandboxId, command, sudo, wait, args = [] },
       { toolCallId }
     ) => {
-      writer.write({
-        id: toolCallId,
-        type: 'data-run-command',
-        data: { sandboxId, command, args, status: 'executing' },
+      emitData(writer, toolCallId, 'run-command', {
+        sandboxId,
+        command,
+        args,
+        status: 'executing',
       })
 
       let sandbox: Sandbox | null = null
@@ -59,16 +61,12 @@ export const runCommand = ({ writer }: Params) =>
           error,
         })
 
-        writer.write({
-          id: toolCallId,
-          type: 'data-run-command',
-          data: {
-            sandboxId,
-            command,
-            args,
-            error: richError.error,
-            status: 'error',
-          },
+        emitData(writer, toolCallId, 'run-command', {
+          sandboxId,
+          command,
+          args,
+          error: richError.error,
+          status: 'error',
         })
 
         return richError.message
@@ -90,44 +88,32 @@ export const runCommand = ({ writer }: Params) =>
           error,
         })
 
-        writer.write({
-          id: toolCallId,
-          type: 'data-run-command',
-          data: {
-            sandboxId,
-            command,
-            args,
-            error: richError.error,
-            status: 'error',
-          },
+        emitData(writer, toolCallId, 'run-command', {
+          sandboxId,
+          command,
+          args,
+          error: richError.error,
+          status: 'error',
         })
 
         return richError.message
       }
 
-      writer.write({
-        id: toolCallId,
-        type: 'data-run-command',
-        data: {
+      emitData(writer, toolCallId, 'run-command', {
+        sandboxId,
+        commandId: cmd.cmdId,
+        command,
+        args,
+        status: 'executing',
+      })
+
+      if (!wait) {
+        emitData(writer, toolCallId, 'run-command', {
           sandboxId,
           commandId: cmd.cmdId,
           command,
           args,
-          status: 'executing',
-        },
-      })
-
-      if (!wait) {
-        writer.write({
-          id: toolCallId,
-          type: 'data-run-command',
-          data: {
-            sandboxId,
-            commandId: cmd.cmdId,
-            command,
-            args,
-            status: 'running',
-          },
+          status: 'running',
         })
 
         return `The command \`${command} ${args.join(
@@ -137,16 +123,12 @@ export const runCommand = ({ writer }: Params) =>
         }.`
       }
 
-      writer.write({
-        id: toolCallId,
-        type: 'data-run-command',
-        data: {
-          sandboxId,
-          commandId: cmd.cmdId,
-          command,
-          args,
-          status: 'waiting',
-        },
+      emitData(writer, toolCallId, 'run-command', {
+        sandboxId,
+        commandId: cmd.cmdId,
+        command,
+        args,
+        status: 'waiting',
       })
 
       const done = await cmd.wait()
@@ -156,17 +138,13 @@ export const runCommand = ({ writer }: Params) =>
           done.stderr(),
         ])
 
-        writer.write({
-          id: toolCallId,
-          type: 'data-run-command',
-          data: {
-            sandboxId,
-            commandId: cmd.cmdId,
-            command,
-            args,
-            exitCode: done.exitCode,
-            status: 'done',
-          },
+        emitData(writer, toolCallId, 'run-command', {
+          sandboxId,
+          commandId: cmd.cmdId,
+          command,
+          args,
+          exitCode: done.exitCode,
+          status: 'done',
         })
 
         return (
@@ -185,17 +163,13 @@ export const runCommand = ({ writer }: Params) =>
           error,
         })
 
-        writer.write({
-          id: toolCallId,
-          type: 'data-run-command',
-          data: {
-            sandboxId,
-            commandId: cmd.cmdId,
-            command,
-            args,
-            error: richError.error,
-            status: 'error',
-          },
+        emitData(writer, toolCallId, 'run-command', {
+          sandboxId,
+          commandId: cmd.cmdId,
+          command,
+          args,
+          error: richError.error,
+          status: 'error',
         })
 
         return richError.message

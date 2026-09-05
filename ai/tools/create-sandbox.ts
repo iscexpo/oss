@@ -1,9 +1,11 @@
 import type { UIMessageStreamWriter, UIMessage } from 'ai'
 import type { DataPart } from '../messages/data-parts'
 import { Sandbox } from '@vercel/sandbox'
+import { emitData } from './emit-data'
 import { getRichError } from './get-rich-error'
 import { tool } from 'ai'
 import description from './create-sandbox.md'
+import { VSCODE_PORT } from '@/lib/vscode'
 import z from 'zod/v3'
 
 interface Params {
@@ -27,31 +29,27 @@ export const createSandbox = ({ writer }: Params) =>
         .max(2)
         .optional()
         .describe(
-          'Array of network ports to expose and make accessible from outside the Vercel Sandbox. These ports allow web servers, APIs, or other services running inside the Vercel Sandbox to be reached externally. Common ports include 3000 (Next.js), 8000 (Python servers), 5000 (Flask), etc.'
+          'Array of network ports to expose and make accessible from outside the Vercel Sandbox. These ports allow web servers, APIs, or other services running inside the Vercel Sandbox to be reached externally. Common ports include 3000 (Next.js), 8000 (Python servers), 5000 (Flask), etc. The code-server (VS Code in browser) port is exposed automatically and must not be passed here.'
         ),
     }),
     execute: async ({ timeout, ports }, { toolCallId }) => {
-      writer.write({
-        id: toolCallId,
-        type: 'data-create-sandbox',
-        data: { status: 'loading' },
-      })
+      emitData(writer, toolCallId, 'create-sandbox', { status: 'loading' })
 
       try {
         const sandbox = await Sandbox.create({
           timeout: timeout ?? 600000,
-          ports,
+          ports: [...new Set([...(ports ?? [3000]), VSCODE_PORT])],
         })
 
-        writer.write({
-          id: toolCallId,
-          type: 'data-create-sandbox',
-          data: { sandboxId: sandbox.sandboxId, status: 'done' },
+        emitData(writer, toolCallId, 'create-sandbox', {
+          sandboxId: sandbox.sandboxId,
+          status: 'done',
         })
 
         return (
           `Sandbox created with ID: ${sandbox.sandboxId}.` +
-          `\nYou can now upload files, run commands, and access services on the exposed ports.`
+          `\nYou can now upload files, run commands, and access services on the exposed ports.` +
+          `\nAn in-browser VS Code editor (code-server) is available on the exposed port ${VSCODE_PORT} via the "Open in VS Code" button in the File Explorer panel.`
         )
       } catch (error) {
         const richError = getRichError({
@@ -59,13 +57,9 @@ export const createSandbox = ({ writer }: Params) =>
           error,
         })
 
-        writer.write({
-          id: toolCallId,
-          type: 'data-create-sandbox',
-          data: {
-            error: { message: richError.error.message },
-            status: 'error',
-          },
+        emitData(writer, toolCallId, 'create-sandbox', {
+          error: { message: richError.error.message },
+          status: 'error',
         })
 
         console.log('Error creating Sandbox:', richError.error)
