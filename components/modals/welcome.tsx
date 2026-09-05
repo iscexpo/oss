@@ -61,8 +61,8 @@ export function Welcome(props: {
                 Sandbox
               </ExternalLink>{' '}
               for secure code execution,{' '}
-              <ExternalLink href="https://vercel.com/docs/ai-gateway">
-                AI Gateway
+              <ExternalLink href="https://kilo.ai/docs/gateway">
+                Kilo Gateway
               </ExternalLink>{' '}
               for Claude, GPT, and Grok model support,{' '}
               <ExternalLink href="https://vercel.com/fluid">

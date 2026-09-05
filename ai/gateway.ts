@@ -1,15 +1,13 @@
-import { createGatewayProvider } from '@ai-sdk/gateway'
+import { createOpenAI } from '@ai-sdk/openai'
 import { Models } from './constants'
 import type { JSONValue } from 'ai'
-import type { OpenAIResponsesProviderOptions } from '@ai-sdk/openai'
 import type { LanguageModelV3 } from '@ai-sdk/provider'
 
-const gateway = createGatewayProvider({
-  baseURL: process.env.AI_GATEWAY_BASE_URL,
-  headers: {
-    'http-referer': 'https://oss-vibe-coding-platform.vercel.app/',
-    'x-title': 'Vibe Coding Platform',
-  },
+const gateway = createOpenAI({
+  name: 'kilo',
+  baseURL:
+    process.env.KILO_GATEWAY_BASE_URL ?? 'https://api.kilo.ai/api/gateway',
+  apiKey: process.env.KILO_API_KEY,
 })
 
 export interface ModelOptions {
@@ -24,34 +22,16 @@ export function getModelOptions(
 ): ModelOptions {
   if (modelId === Models.OpenAIGPT53Codex) {
     return {
-      model: gateway(modelId),
+      model: gateway.chat(modelId),
       providerOptions: {
         openai: {
-          include: ['reasoning.encrypted_content'],
           reasoningEffort: options?.reasoningEffort ?? 'low',
-          reasoningSummary: 'auto',
-          serviceTier: 'priority',
-        } satisfies OpenAIResponsesProviderOptions,
-      },
-    }
-  }
-
-  if (
-    modelId === Models.AnthropicClaudeSonnet46 ||
-    modelId === Models.AnthropicClaudeOpus46
-  ) {
-    return {
-      model: gateway(modelId),
-      headers: { 'anthropic-beta': 'fine-grained-tool-streaming-2025-05-14' },
-      providerOptions: {
-        anthropic: {
-          cacheControl: { type: 'ephemeral' },
         },
       },
     }
   }
 
   return {
-    model: gateway(modelId),
+    model: gateway.chat(modelId),
   }
 }
