@@ -11,8 +11,8 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import "./globals.css";
 
-const title = "OSS Vibe Coding Platform";
-const description = `This is a demo of an end-to-end coding platform where the user can enter text prompts, and the agent will create a full stack application. It uses Vercel's AI Cloud services like Sandbox for secure code execution, AI Gateway for GPT-5 and other models support, Fluid Compute for efficient rendering and streaming, and it's built with Next.js and the AI SDK.`;
+const title = "Sign in to v0";
+const description = "Sign in to v0 using your Vercel account.";
 
 export const metadata: Metadata = {
   title,
@@ -38,7 +38,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
   const previewProxyUrl = getPreviewProxyUrl();
 
   return (
-    <html lang="en">
+    <html lang="en" className="dark bg-background">
       <body className="antialiased">
         <Suspense fallback={null}>
           <NuqsAdapter>
