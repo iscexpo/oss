@@ -11,7 +11,12 @@
     "build": "dotenv -e .env.local -- turbo run build",
     "start": "dotenv -e .env.local -- turbo run start",
     "typecheck": "turbo run typecheck",
-    "format": "oxfmt apps/**/*.{ts,tsx,js,jsx,json,css,md}"
+    "format": "oxfmt apps/**/*.{ts,tsx,js,jsx,json,css,md}",
+    "test": "pnpm --filter @vibe-coding/web test",
+    "test:coverage": "pnpm --filter @vibe-coding/web test:coverage",
+    "test:e2e": "pnpm --filter @vibe-coding/web test:e2e",
+    "test:a11y": "pnpm --filter @vibe-coding/web test:a11y",
+    "test:visual": "pnpm --filter @vibe-coding/web test:visual"
   },
   "devDependencies": {
     "dotenv-cli": "^11.0.0",
