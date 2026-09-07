@@ -1,20 +1,20 @@
-'use client'
+"use client";
 
-import { BarLoader } from 'react-spinners'
-import { CompassIcon, ExternalLinkIcon, RefreshCwIcon, XIcon } from 'lucide-react'
-import { ScrollArea } from '@radix-ui/react-scroll-area'
-import { Panel, PanelHeader } from '@/components/panels/panels'
-import { usePreviewOrigin } from './preview-provider'
-import { useSandboxStore } from '@/app/state'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { cn } from '@/lib/utils'
+import { BarLoader } from "react-spinners";
+import { CompassIcon, ExternalLinkIcon, RefreshCwIcon, XIcon } from "lucide-react";
+import { ScrollArea } from "@radix-ui/react-scroll-area";
+import { Panel, PanelHeader } from "@/components/panels/panels";
+import { usePreviewOrigin } from "./preview-provider";
+import { useSandboxStore } from "@/app/state";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface Props {
-  className?: string
-  disabled?: boolean
+  className?: string;
+  disabled?: boolean;
 }
 
-const LOADING_MESSAGE = 'v0-preview-loading'
+const LOADING_MESSAGE = "v0-preview-loading";
 
 /**
  * iframe pane that routes generated-app previews through the isolated
@@ -24,80 +24,80 @@ const LOADING_MESSAGE = 'v0-preview-loading'
  * @see https://github.com/vercel-labs/v0-sdk/blob/main/examples/v0-clone/apps/web/components/preview/preview-pane.tsx
  */
 export function PreviewPane({ className, disabled }: Props) {
-  const { sandboxId, url: sandboxUrl, urlUUID, port, status } = useSandboxStore()
-  const { origin: proxyOrigin } = usePreviewOrigin()
+  const { sandboxId, url: sandboxUrl, urlUUID, port, status } = useSandboxStore();
+  const { origin: proxyOrigin } = usePreviewOrigin();
 
-  const [manualSrc, setManualSrc] = useState<string | undefined>(undefined)
-  const [address, setAddress] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const iframeRef = useRef<HTMLIFrameElement>(null)
-  const loadStartTime = useRef<number | null>(null)
+  const [manualSrc, setManualSrc] = useState<string | undefined>(undefined);
+  const [address, setAddress] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const loadStartTime = useRef<number | null>(null);
 
-  const frameKey = `${sandboxId ?? 'none'}:${urlUUID ?? 'none'}`
+  const frameKey = `${sandboxId ?? "none"}:${urlUUID ?? "none"}`;
 
   const previewUrl = useMemo(() => {
-    if (!proxyOrigin || !sandboxId) return undefined
-    const url = new URL(`${proxyOrigin}/api/preview/${sandboxId}`)
-    url.searchParams.set('port', String(port ?? 3000))
-    return url.toString()
-  }, [proxyOrigin, sandboxId, port])
+    if (!proxyOrigin || !sandboxId) return undefined;
+    const url = new URL(`${proxyOrigin}/api/preview/${sandboxId}`);
+    url.searchParams.set("port", String(port ?? 3000));
+    return url.toString();
+  }, [proxyOrigin, sandboxId, port]);
 
-  const effectiveSrc = manualSrc ?? previewUrl
-
-  useEffect(() => {
-    setManualSrc(undefined)
-    setError(null)
-    setIsLoading(!!previewUrl)
-  }, [frameKey, previewUrl])
+  const effectiveSrc = manualSrc ?? previewUrl;
 
   useEffect(() => {
-    setAddress(effectiveSrc ?? '')
-  }, [effectiveSrc])
+    setManualSrc(undefined);
+    setError(null);
+    setIsLoading(!!previewUrl);
+  }, [frameKey, previewUrl]);
+
+  useEffect(() => {
+    setAddress(effectiveSrc ?? "");
+  }, [effectiveSrc]);
 
   // The sandbox-proxy loading page broadcasts this while a preview boots.
   useEffect(() => {
     const onMessage = (event: MessageEvent) => {
       if (event.data?.type === LOADING_MESSAGE) {
-        setIsLoading(true)
-        setError(null)
-        loadStartTime.current = Date.now()
+        setIsLoading(true);
+        setError(null);
+        loadStartTime.current = Date.now();
       }
-    }
-    window.addEventListener('message', onMessage)
-    return () => window.removeEventListener('message', onMessage)
-  }, [])
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, []);
 
   const refreshIframe = useCallback(() => {
-    const target = effectiveSrc
-    if (!iframeRef.current || !target) return
-    setIsLoading(true)
-    setError(null)
-    loadStartTime.current = Date.now()
-    iframeRef.current.src = ''
+    const target = effectiveSrc;
+    if (!iframeRef.current || !target) return;
+    setIsLoading(true);
+    setError(null);
+    loadStartTime.current = Date.now();
+    iframeRef.current.src = "";
     setTimeout(() => {
-      if (iframeRef.current) iframeRef.current.src = target
-    }, 10)
-  }, [effectiveSrc])
+      if (iframeRef.current) iframeRef.current.src = target;
+    }, 10);
+  }, [effectiveSrc]);
 
   const navigateTo = useCallback(() => {
-    const value = address.trim()
-    if (!value) return
+    const value = address.trim();
+    if (!value) return;
     if (iframeRef.current) {
-      setIsLoading(true)
-      setError(null)
-      loadStartTime.current = Date.now()
-      iframeRef.current.src = value
+      setIsLoading(true);
+      setError(null);
+      loadStartTime.current = Date.now();
+      iframeRef.current.src = value;
     }
     // Keep whatever URL was typed (proxy-scoped or arbitrary) until "return
     // to preview" is pressed, so sub-path edits don't snap back on re-render.
-    setManualSrc(value)
-  }, [address])
+    setManualSrc(value);
+  }, [address]);
 
   const openInNewTab = () => {
-    const external = sandboxUrl
-    if (external) window.open(external, '_blank', 'noopener,noreferrer')
-  }
+    const external = sandboxUrl;
+    if (external) window.open(external, "_blank", "noopener,noreferrer");
+  };
 
   return (
     <Panel className={className}>
@@ -123,7 +123,7 @@ export function PreviewPane({ className, disabled }: Props) {
           <button
             type="button"
             onClick={refreshIframe}
-            className={cn('cursor-pointer px-1', { 'animate-spin': isLoading })}
+            className={cn("cursor-pointer px-1", { "animate-spin": isLoading })}
             title="Reload the preview"
           >
             <RefreshCwIcon className="w-4" />
@@ -147,9 +147,9 @@ export function PreviewPane({ className, disabled }: Props) {
             onChange={(event) => setAddress(event.target.value)}
             onClick={(event) => event.currentTarget.select()}
             onKeyDown={(event) => {
-              if (event.key === 'Enter') {
-                event.currentTarget.blur()
-                navigateTo()
+              if (event.key === "Enter") {
+                event.currentTarget.blur();
+                navigateTo();
               }
             }}
             value={address}
@@ -161,15 +161,13 @@ export function PreviewPane({ className, disabled }: Props) {
       <div className="flex h-[calc(100%-2rem-1px)] relative">
         {!sandboxId && (
           <div className="flex items-center justify-center w-full h-full font-mono text-sm text-muted-foreground">
-            Run the agent to generate an app — its live preview will appear
-            here.
+            Run the agent to generate an app — its live preview will appear here.
           </div>
         )}
 
         {!proxyOrigin && sandboxId && (
           <div className="flex items-center justify-center w-full h-full font-mono text-sm text-muted-foreground">
-            Preview proxy is not configured. Set VIBE_PREVIEW_PROXY_URL and
-            restart.
+            Preview proxy is not configured. Set VIBE_PREVIEW_PROXY_URL and restart.
           </div>
         )}
 
@@ -182,12 +180,12 @@ export function PreviewPane({ className, disabled }: Props) {
                 src={effectiveSrc}
                 className="w-full h-full"
                 onLoad={() => {
-                  setIsLoading(false)
-                  setError(null)
+                  setIsLoading(false);
+                  setError(null);
                 }}
                 onError={() => {
-                  setIsLoading(false)
-                  setError('Failed to load the page')
+                  setIsLoading(false);
+                  setError("Failed to load the page");
                 }}
                 title="Sandbox preview"
               />
@@ -222,5 +220,5 @@ export function PreviewPane({ className, disabled }: Props) {
         )}
       </div>
     </Panel>
-  )
+  );
 }

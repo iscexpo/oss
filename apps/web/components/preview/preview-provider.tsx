@@ -1,12 +1,12 @@
-'use client'
+"use client";
 
-import { createContext, useContext } from 'react'
+import { createContext, useContext } from "react";
 
 interface PreviewContextValue {
-  origin?: string
+  origin?: string;
 }
 
-const PreviewContext = createContext<PreviewContextValue>({ origin: undefined })
+const PreviewContext = createContext<PreviewContextValue>({ origin: undefined });
 
 /**
  * Provides the resolved sandbox-proxy origin to the preview pane, mirroring
@@ -19,16 +19,16 @@ export function PreviewOriginProvider({
   origin,
   children,
 }: {
-  origin?: string | null
-  children: React.ReactNode
+  origin?: string | null;
+  children: React.ReactNode;
 }) {
   return (
     <PreviewContext.Provider value={{ origin: origin ?? undefined }}>
       {children}
     </PreviewContext.Provider>
-  )
+  );
 }
 
 export function usePreviewOrigin() {
-  return useContext(PreviewContext)
+  return useContext(PreviewContext);
 }

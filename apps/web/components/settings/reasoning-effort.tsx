@@ -27,9 +27,7 @@ export function ReasoningEffort() {
         id="effort-level"
         className="ml-3 pointer-events-none"
         checked={effort === "medium"}
-        onCheckedChange={(checked) =>
-          setEffort(checked === true ? "medium" : "low")
-        }
+        onCheckedChange={(checked) => setEffort(checked === true ? "medium" : "low")}
       />
     </div>
   );

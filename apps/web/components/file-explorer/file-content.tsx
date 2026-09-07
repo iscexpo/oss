@@ -1,27 +1,24 @@
-import { SyntaxHighlighter } from './syntax-highlighter'
-import { PulseLoader } from 'react-spinners'
-import { memo } from 'react'
-import useSWR from 'swr'
+import { SyntaxHighlighter } from "./syntax-highlighter";
+import { PulseLoader } from "react-spinners";
+import { memo } from "react";
+import useSWR from "swr";
 
 interface Props {
-  sandboxId: string
-  path: string
+  sandboxId: string;
+  path: string;
 }
 
-export const FileContent = memo(function FileContent({
-  sandboxId,
-  path,
-}: Props) {
-  const searchParams = new URLSearchParams({ path })
+export const FileContent = memo(function FileContent({ sandboxId, path }: Props) {
+  const searchParams = new URLSearchParams({ path });
   const content = useSWR(
     `/api/sandboxes/${sandboxId}/files?${searchParams.toString()}`,
     async (pathname: string, init: RequestInit) => {
-      const response = await fetch(pathname, init)
-      const text = await response.text()
-      return text
+      const response = await fetch(pathname, init);
+      const text = await response.text();
+      return text;
     },
-    { refreshInterval: 1000 }
-  )
+    { refreshInterval: 1000 },
+  );
 
   if (content.isLoading || !content.data) {
     return (
@@ -30,8 +27,8 @@ export const FileContent = memo(function FileContent({
           <PulseLoader className="opacity-60" size={8} />
         </div>
       </div>
-    )
+    );
   }
 
-  return <SyntaxHighlighter path={path} code={content.data} />
-})
+  return <SyntaxHighlighter path={path} code={content.data} />;
+});
