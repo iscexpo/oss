@@ -1,40 +1,23 @@
 "use client";
 
-import { type ChatUIMessage } from "@/components/chat/types";
 import { type ReactNode } from "react";
-import { Chat } from "@ai-sdk/react";
-import { DataPart } from "@/ai/messages/data-parts";
-import { DataUIPart } from "ai";
-import { createContext, useContext, useMemo, useRef } from "react";
-import { useDataStateMapper } from "@/app/state";
-import { mutate } from "swr";
-import { toast } from "sonner";
+import { DefaultChatTransport } from "ai";
+import type { ChatUIMessage } from "@/components/chat/types";
+import { createContext, useContext, useMemo } from "react";
 
 interface ChatContextValue {
-  chat: Chat<ChatUIMessage>;
+  transport: DefaultChatTransport<ChatUIMessage>;
 }
 
 const ChatContext = createContext<ChatContextValue | undefined>(undefined);
 
 export function ChatProvider({ children }: { children: ReactNode }) {
-  const mapDataToState = useDataStateMapper();
-  const mapDataToStateRef = useRef(mapDataToState);
-  mapDataToStateRef.current = mapDataToState;
-
-  const chat = useMemo(
-    () =>
-      new Chat<ChatUIMessage>({
-        onToolCall: () => mutate("/api/auth/info"),
-        onData: (data: DataUIPart<DataPart>) => mapDataToStateRef.current(data),
-        onError: (error) => {
-          toast.error(`Communication error with the AI: ${error.message}`);
-          console.error("Error sending message:", error);
-        },
-      }),
+  const transport = useMemo(
+    () => new DefaultChatTransport<ChatUIMessage>({ api: "/api/chat" }),
     [],
   );
 
-  return <ChatContext.Provider value={{ chat }}>{children}</ChatContext.Provider>;
+  return <ChatContext.Provider value={{ transport }}>{children}</ChatContext.Provider>;
 }
 
 export function useSharedChatContext() {
