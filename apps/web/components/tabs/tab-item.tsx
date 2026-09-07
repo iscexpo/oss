@@ -13,7 +13,7 @@ export function TabItem({ children, tabId }: Props) {
   const [activeTabId, setTabId] = useTabState();
   return (
     <li
-      onClick={() => setTabId(tabId)}
+      onClick={() => setTabId(tabId as any)}
       className={cn("cursor-pointer", {
         "border-b border-b-black": activeTabId === tabId,
       })}

@@ -1,7 +1,6 @@
 "use client";
 
 import type { ChatUIMessage } from "@/components/chat/types";
-import { TEST_PROMPTS } from "@/ai/constants";
 import { MessageCircleIcon, SendIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,10 +19,17 @@ import { useCallback, useEffect } from "react";
 import { useSharedChatContext } from "@/lib/chat-context";
 import { useSettings } from "@/components/settings/use-settings";
 import { useSandboxStore } from "./state";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Sparkles, Rocket } from "lucide-react";
 
 interface Props {
   className: string;
-  modelId?: string;
 }
 
 export function Chat({ className }: Props) {
@@ -43,69 +49,116 @@ export function Chat({ className }: Props) {
     [sendMessage, modelId, setInput, reasoningEffort],
   );
 
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      validateAndSubmitMessage(input);
+    },
+    [validateAndSubmitMessage],
+  );
+
   useEffect(() => {
     setChatStatus(status);
   }, [status, setChatStatus]);
 
+  const isEmpty = messages.length === 0;
+
   return (
     <Panel className={className}>
-      <PanelHeader>
-        <div className="flex items-center font-mono font-semibold uppercase">
-          <MessageCircleIcon className="mr-2 w-4" />
-          Chat
-        </div>
-        <div className="ml-auto font-mono text-xs opacity-50">[{status}]</div>
-      </PanelHeader>
+      {isEmpty ? (
+        <div className="flex-1 flex flex-col items-center justify-center overflow-auto p-6">
+          <div className="w-full max-w-xl">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground mb-8 text-center">
+              What do you want to create?
+            </h1>
 
-      {/* Messages Area */}
-      {messages.length === 0 ? (
-        <div className="flex-1 min-h-0">
-          <div className="flex flex-col justify-center items-center h-full font-mono text-sm text-muted-foreground">
-            <p className="flex items-center font-semibold">Click and try one of these prompts:</p>
-            <ul className="p-4 space-y-1 text-center">
-              {TEST_PROMPTS.map((prompt, idx) => (
-                <li
-                  key={idx}
-                  className="px-4 py-2 rounded-sm border border-dashed shadow-sm cursor-pointer border-border hover:bg-secondary/50 hover:text-primary"
-                  onClick={() => validateAndSubmitMessage(prompt)}
-                >
-                  {prompt}
-                </li>
-              ))}
-            </ul>
+            <div className="rounded-xl border border-border bg-card p-6 shadow-lg">
+              <div className="mb-4">
+                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">
+                  Model
+                </label>
+                <ModelSelector />
+              </div>
+
+              <div className="mb-4">
+                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">
+                  Project
+                </label>
+                <Select>
+                  <SelectTrigger className="bg-background border-border text-sm w-full">
+                    <SelectValue placeholder="Select a project" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="my-project">my-project</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-3">
+                <div className="relative">
+                  <textarea
+                    className="w-full min-h-[120px] rounded-lg bg-background border border-input text-foreground placeholder:text-muted-foreground p-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent resize-none"
+                    placeholder="Describe what you want to build..."
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">
+                    <Sparkles className="w-3 h-3 inline mr-1" />
+                    Powered by AI
+                  </span>
+                  <Button type="submit" disabled={!input.trim()} className="gap-2">
+                    <Rocket className="w-4 h-4" />
+                    Generate
+                  </Button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       ) : (
-        <Conversation className="relative w-full">
-          <ConversationContent className="space-y-4">
-            {messages.map((message) => (
-              <Message key={message.id} message={message} />
-            ))}
-          </ConversationContent>
-          <ConversationScrollButton />
-        </Conversation>
-      )}
+        <>
+          <PanelHeader>
+            <div className="flex items-center font-mono font-semibold uppercase">
+              <MessageCircleIcon className="mr-2 w-4" />
+              Chat
+            </div>
+            <div className="ml-auto font-mono text-xs opacity-50">[{status}]</div>
+          </PanelHeader>
 
-      <form
-        className="flex items-center p-2 space-x-1 border-t border-primary/18 bg-background"
-        onSubmit={async (event) => {
-          event.preventDefault();
-          validateAndSubmitMessage(input);
-        }}
-      >
-        <Settings />
-        <ModelSelector />
-        <Input
-          className="w-full font-mono text-sm rounded-sm border-0 bg-background"
-          disabled={status === "streaming" || status === "submitted"}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Type your message..."
-          value={input}
-        />
-        <Button type="submit" disabled={status !== "ready" || !input.trim()}>
-          <SendIcon className="w-4 h-4" />
-        </Button>
-      </form>
+          <Conversation className="relative w-full">
+            <ConversationContent className="space-y-4">
+              {messages.map((message) => (
+                <Message key={message.id} message={message} />
+              ))}
+            </ConversationContent>
+            <ConversationScrollButton />
+          </Conversation>
+
+          <form
+            className="flex items-center p-2 space-x-1 border-t border-primary/18 bg-background"
+            onSubmit={async (event) => {
+              event.preventDefault();
+              validateAndSubmitMessage(input);
+            }}
+          >
+            <Settings />
+            <ModelSelector />
+            <Input
+              className="w-full font-mono text-sm rounded-sm border-0 bg-background"
+              disabled={status === "streaming" || status === "submitted"}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Type your message..."
+              value={input}
+            />
+            <Button type="submit" disabled={status !== "ready" || !input.trim()}>
+              <SendIcon className="w-4 h-4" />
+            </Button>
+          </form>
+        </>
+      )}
     </Panel>
   );
 }
