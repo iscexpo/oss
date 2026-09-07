@@ -1,17 +1,17 @@
-import { Chat } from './chat'
-import { FileExplorer } from './file-explorer'
-import { Header } from './header'
-import { Logs } from './logs'
-import { Preview } from './preview'
-import { Sidebar } from '@/components/layout/sidebar'
-import { TabContent, TabItem } from '@/components/tabs'
-import { Welcome } from '@/components/modals/welcome'
-import { cookies } from 'next/headers'
-import { hideBanner } from '@/app/actions'
+import { Chat } from "./chat";
+import { FileExplorer } from "./file-explorer";
+import { Header } from "./header";
+import { Logs } from "./logs";
+import { Preview } from "./preview";
+import { Sidebar } from "@/components/layout/sidebar";
+import { TabContent, TabItem } from "@/components/tabs";
+import { Welcome } from "@/components/modals/welcome";
+import { cookies } from "next/headers";
+import { hideBanner } from "@/app/actions";
 
 export default async function Page() {
-  const store = await cookies()
-  const banner = store.get('banner-hidden')?.value !== 'true'
+  const store = await cookies();
+  const banner = store.get("banner-hidden")?.value !== "true";
   return (
     <>
       <Welcome defaultOpen={banner} onDismissAction={hideBanner} />
@@ -31,16 +31,10 @@ export default async function Page() {
           <TabContent tabId="chat" className="flex-1 h-full overflow-hidden">
             <Chat className="flex-1 overflow-hidden" />
           </TabContent>
-          <TabContent
-            tabId="preview"
-            className="flex-1 h-full overflow-hidden"
-          >
+          <TabContent tabId="preview" className="flex-1 h-full overflow-hidden">
             <Preview className="flex-1 overflow-hidden" />
           </TabContent>
-          <TabContent
-            tabId="file-explorer"
-            className="flex-1 h-full overflow-hidden"
-          >
+          <TabContent tabId="file-explorer" className="flex-1 h-full overflow-hidden">
             <FileExplorer className="flex-1 overflow-hidden" />
           </TabContent>
           <TabContent tabId="logs" className="flex-1 h-full overflow-hidden">
@@ -52,33 +46,21 @@ export default async function Page() {
         <div className="hidden md:flex flex-1 w-full min-h-0 overflow-hidden">
           <Sidebar />
           <div className="flex-1 min-h-0 overflow-hidden">
-            <TabContent
-              tabId="chat"
-              className="flex-1 h-full overflow-hidden"
-            >
+            <TabContent tabId="chat" className="flex-1 h-full overflow-hidden">
               <Chat className="flex-1 overflow-hidden" />
             </TabContent>
-            <TabContent
-              tabId="preview"
-              className="flex-1 h-full overflow-hidden"
-            >
+            <TabContent tabId="preview" className="flex-1 h-full overflow-hidden">
               <Preview className="flex-1 overflow-hidden" />
             </TabContent>
-            <TabContent
-              tabId="file-explorer"
-              className="flex-1 h-full overflow-hidden"
-            >
+            <TabContent tabId="file-explorer" className="flex-1 h-full overflow-hidden">
               <FileExplorer className="flex-1 overflow-hidden" />
             </TabContent>
-            <TabContent
-              tabId="logs"
-              className="flex-1 h-full overflow-hidden"
-            >
+            <TabContent tabId="logs" className="flex-1 h-full overflow-hidden">
               <Logs className="flex-1 overflow-hidden" />
             </TabContent>
           </div>
         </div>
       </div>
     </>
-  )
+  );
 }

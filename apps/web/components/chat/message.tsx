@@ -1,55 +1,50 @@
-import type { ChatUIMessage } from './types'
-import { MessagePart } from './message-part'
-import { BotIcon, UserIcon } from 'lucide-react'
-import { memo, createContext, useContext, useState, useEffect } from 'react'
-import { cn } from '@/lib/utils'
+import type { ChatUIMessage } from "./types";
+import { MessagePart } from "./message-part";
+import { BotIcon, UserIcon } from "lucide-react";
+import { memo, createContext, useContext, useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
 
 interface Props {
-  message: ChatUIMessage
+  message: ChatUIMessage;
 }
 
 interface ReasoningContextType {
-  expandedReasoningIndex: number | null
-  setExpandedReasoningIndex: (index: number | null) => void
+  expandedReasoningIndex: number | null;
+  setExpandedReasoningIndex: (index: number | null) => void;
 }
 
-const ReasoningContext = createContext<ReasoningContextType | null>(null)
+const ReasoningContext = createContext<ReasoningContextType | null>(null);
 
 export const useReasoningContext = () => {
-  const context = useContext(ReasoningContext)
-  return context
-}
+  const context = useContext(ReasoningContext);
+  return context;
+};
 
 export const Message = memo(function Message({ message }: Props) {
-  const [expandedReasoningIndex, setExpandedReasoningIndex] = useState<
-    number | null
-  >(null)
+  const [expandedReasoningIndex, setExpandedReasoningIndex] = useState<number | null>(null);
 
   const reasoningParts = message.parts
     .map((part, index) => ({ part, index }))
-    .filter(({ part }) => part.type === 'reasoning')
+    .filter(({ part }) => part.type === "reasoning");
 
   useEffect(() => {
     if (reasoningParts.length > 0) {
-      const latestReasoningIndex =
-        reasoningParts[reasoningParts.length - 1].index
-      setExpandedReasoningIndex(latestReasoningIndex)
+      const latestReasoningIndex = reasoningParts[reasoningParts.length - 1].index;
+      setExpandedReasoningIndex(latestReasoningIndex);
     }
-  }, [reasoningParts])
+  }, [reasoningParts]);
 
   return (
-    <ReasoningContext.Provider
-      value={{ expandedReasoningIndex, setExpandedReasoningIndex }}
-    >
+    <ReasoningContext.Provider value={{ expandedReasoningIndex, setExpandedReasoningIndex }}>
       <div
         className={cn({
-          'mr-20': message.role === 'assistant',
-          'ml-20': message.role === 'user',
+          "mr-20": message.role === "assistant",
+          "ml-20": message.role === "user",
         })}
       >
         {/* Message Header */}
         <div className="flex items-center gap-2 text-sm font-medium font-mono text-primary mb-1.5">
-          {message.role === 'user' ? (
+          {message.role === "user" ? (
             <>
               <UserIcon className="ml-auto w-4" />
               <span>You</span>
@@ -70,5 +65,5 @@ export const Message = memo(function Message({ message }: Props) {
         </div>
       </div>
     </ReasoningContext.Provider>
-  )
-})
+  );
+});

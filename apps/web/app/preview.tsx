@@ -1,13 +1,13 @@
-'use client'
+"use client";
 
-import { PreviewPane } from '@/components/preview/preview-pane'
-import { useSandboxStore } from './state'
+import { PreviewPane } from "@/components/preview/preview-pane";
+import { useSandboxStore } from "./state";
 
 interface Props {
-  className?: string
+  className?: string;
 }
 
 export function Preview({ className }: Props) {
-  const { status } = useSandboxStore()
-  return <PreviewPane className={className} disabled={status === 'stopped'} />
+  const { status } = useSandboxStore();
+  return <PreviewPane className={className} disabled={status === "stopped"} />;
 }

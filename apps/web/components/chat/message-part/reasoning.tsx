@@ -1,33 +1,27 @@
-import type { ReasoningUIPart } from 'ai'
-import { MessageSpinner } from '../message-spinner'
-import { useReasoningContext } from '../message'
-import { Streamdown } from 'streamdown'
+import type { ReasoningUIPart } from "ai";
+import { MessageSpinner } from "../message-spinner";
+import { useReasoningContext } from "../message";
+import { Streamdown } from "streamdown";
 
-export function Reasoning({
-  part,
-  partIndex,
-}: {
-  part: ReasoningUIPart
-  partIndex: number
-}) {
-  const context = useReasoningContext()
-  const isExpanded = context?.expandedReasoningIndex === partIndex
+export function Reasoning({ part, partIndex }: { part: ReasoningUIPart; partIndex: number }) {
+  const context = useReasoningContext();
+  const isExpanded = context?.expandedReasoningIndex === partIndex;
 
-  if (part.state === 'done' && !part.text) {
-    return null
+  if (part.state === "done" && !part.text) {
+    return null;
   }
 
-  const text = part.text || '_Thinking_'
-  const isStreaming = part.state === 'streaming'
-  const firstLine = text.split('\n')[0].replace(/\*\*/g, '')
-  const hasMoreContent = text.includes('\n') || text.length > 80
+  const text = part.text || "_Thinking_";
+  const isStreaming = part.state === "streaming";
+  const firstLine = text.split("\n")[0].replace(/\*\*/g, "");
+  const hasMoreContent = text.includes("\n") || text.length > 80;
 
   const handleClick = () => {
     if (hasMoreContent && context) {
-      const newIndex = isExpanded ? null : partIndex
-      context.setExpandedReasoningIndex(newIndex)
+      const newIndex = isExpanded ? null : partIndex;
+      context.setExpandedReasoningIndex(newIndex);
     }
-  }
+  };
 
   return (
     <div
@@ -45,5 +39,5 @@ export function Reasoning({
         </div>
       </div>
     </div>
-  )
+  );
 }
