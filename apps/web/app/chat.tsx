@@ -1,7 +1,7 @@
 "use client";
 
 import type { ChatUIMessage } from "@/components/chat/types";
-import { MessageCircleIcon, SendIcon } from "lucide-react";
+import { ArrowUp, MessageCircle, Plus, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Conversation,
@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Message } from "@/components/chat/message";
 import { ModelSelector } from "@/components/settings/model-selector";
-import { Panel, PanelHeader } from "@/components/panels/panels";
+import { Panel } from "@/components/panels/panels";
 import { Settings } from "@/components/settings/settings";
 import { useChat } from "@ai-sdk/react";
 import { useLocalStorageValue } from "@/lib/use-local-storage-value";
@@ -26,7 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Sparkles, Rocket } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Props {
   className: string;
@@ -34,27 +34,30 @@ interface Props {
 
 export function Chat({ className }: Props) {
   const [input, setInput] = useLocalStorageValue("prompt-input");
+  const [project, setProject] = useLocalStorageValue("prompt-project");
   const { transport } = useSharedChatContext();
   const { modelId, reasoningEffort } = useSettings();
   const { messages, sendMessage, status } = useChat<ChatUIMessage>({ transport });
   const { setChatStatus } = useSandboxStore();
+  const isBusy = status === "streaming" || status === "submitted";
+  const canSubmit = input.trim().length > 0 && !isBusy;
 
   const validateAndSubmitMessage = useCallback(
     (text: string) => {
-      if (text.trim()) {
+      if (text.trim() && !isBusy) {
         sendMessage({ text }, { body: { modelId, reasoningEffort } });
         setInput("");
       }
     },
-    [sendMessage, modelId, setInput, reasoningEffort],
+    [sendMessage, modelId, setInput, reasoningEffort, isBusy],
   );
 
   const handleSubmit = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault();
+    (event: React.FormEvent) => {
+      event.preventDefault();
       validateAndSubmitMessage(input);
     },
-    [validateAndSubmitMessage],
+    [input, validateAndSubmitMessage],
   );
 
   useEffect(() => {
@@ -64,72 +67,91 @@ export function Chat({ className }: Props) {
   const isEmpty = messages.length === 0;
 
   return (
-    <Panel className={className}>
+    <Panel className={cn("bg-black text-zinc-200", className)}>
       {isEmpty ? (
-        <div className="flex-1 flex flex-col items-center justify-center overflow-auto p-6">
-          <div className="w-full max-w-xl">
-            <h1 className="text-2xl font-bold tracking-tight text-foreground mb-8 text-center">
+        <div className="flex min-h-0 flex-1 flex-col justify-center overflow-y-auto px-5 py-8">
+          <div className="mx-auto w-full max-w-xl">
+            <h1 className="mb-7 text-center text-[32px] font-semibold tracking-[-0.02em] text-zinc-50">
               What do you want to create?
             </h1>
 
-            <div className="rounded-xl border border-border bg-card p-6 shadow-lg">
-              <div className="mb-4">
-                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">
-                  Model
-                </label>
-                <ModelSelector />
-              </div>
-
-              <div className="mb-4">
-                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">
-                  Project
-                </label>
-                <Select>
-                  <SelectTrigger className="bg-background border-border text-sm w-full">
-                    <SelectValue placeholder="Select a project" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="my-project">my-project</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-3">
-                <div className="relative">
-                  <textarea
-                    className="w-full min-h-[120px] rounded-lg bg-background border border-input text-foreground placeholder:text-muted-foreground p-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent resize-none"
-                    placeholder="Describe what you want to build..."
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                  />
+            <form
+              onSubmit={handleSubmit}
+              className="rounded-xl border border-[#2b2b2b] bg-[#111111] shadow-[0_18px_50px_rgba(0,0,0,0.55)]"
+            >
+              <label className="sr-only" htmlFor="new-prompt">
+                Describe what you want to build
+              </label>
+              <textarea
+                id="new-prompt"
+                className="min-h-[104px] w-full resize-none bg-transparent px-4 pt-4 text-[15px] leading-6 text-zinc-100 outline-none placeholder:text-zinc-600"
+                onChange={(event) => setInput(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" && !event.shiftKey) {
+                    event.preventDefault();
+                    validateAndSubmitMessage(input);
+                  }
+                }}
+                placeholder="Describe what you want to build..."
+                value={input}
+              />
+              <div className="flex items-center gap-1 px-2 pb-2">
+                <Button
+                  aria-label="Add attachment"
+                  className="size-8 shrink-0 text-zinc-400 hover:bg-white/5 hover:text-zinc-100"
+                  size="icon"
+                  type="button"
+                  variant="ghost"
+                >
+                  <Plus className="size-4" aria-hidden="true" />
+                </Button>
+                <div className="min-w-0 [&_[data-slot=select-trigger]]:h-8 [&_[data-slot=select-trigger]]:border-transparent [&_[data-slot=select-trigger]]:bg-transparent [&_[data-slot=select-trigger]]:px-1.5 [&_[data-slot=select-trigger]]:text-[13px] [&_[data-slot=select-trigger]]:text-zinc-300 [&_[data-slot=select-trigger]]:shadow-none hover:[&_[data-slot=select-trigger]]:bg-white/5">
+                  <ModelSelector className="border-transparent" />
                 </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">
-                    <Sparkles className="w-3 h-3 inline mr-1" />
-                    Powered by AI
-                  </span>
-                  <Button type="submit" disabled={!input.trim()} className="gap-2">
-                    <Rocket className="w-4 h-4" />
-                    Generate
+                <div className="ml-auto flex min-w-0 items-center gap-1">
+                  <label className="sr-only" htmlFor="new-prompt-project">
+                    Project
+                  </label>
+                  <Select
+                    onValueChange={setProject}
+                    value={project === "" ? "my-project" : project}
+                  >
+                    <SelectTrigger
+                      id="new-prompt-project"
+                      className="h-8 max-w-28 border-transparent bg-transparent px-1.5 text-[13px] text-zinc-400 shadow-none hover:bg-white/5 hover:text-zinc-200"
+                    >
+                      <SelectValue placeholder="Project" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="my-project">my-project</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    aria-label="Create with prompt"
+                    className="size-8 shrink-0 rounded-md bg-zinc-100 text-black hover:bg-white disabled:bg-[#2a2a2a] disabled:text-zinc-600"
+                    disabled={!canSubmit}
+                    size="icon"
+                    type="submit"
+                  >
+                    <ArrowUp className="size-4" aria-hidden="true" />
                   </Button>
                 </div>
-              </form>
-            </div>
+              </div>
+            </form>
           </div>
         </div>
       ) : (
-        <>
-          <PanelHeader>
-            <div className="flex items-center font-mono font-semibold uppercase">
-              <MessageCircleIcon className="mr-2 w-4" />
-              Chat
-            </div>
-            <div className="ml-auto font-mono text-xs opacity-50">[{status}]</div>
-          </PanelHeader>
+        <div className="flex min-h-0 flex-1 flex-col bg-black">
+          <div className="flex h-10 shrink-0 items-center gap-2 border-b border-[#242424] px-3 text-xs">
+            <MessageCircle className="size-3.5 text-zinc-500" aria-hidden="true" />
+            <span className="font-medium tracking-wide text-zinc-300 uppercase">Chat</span>
+            <span className="ml-auto rounded border border-[#2a2a2a] bg-[#111111] px-1.5 py-0.5 font-mono text-[10px] text-zinc-500 uppercase">
+              {status}
+            </span>
+          </div>
 
-          <Conversation className="relative w-full">
-            <ConversationContent className="space-y-4">
+          <Conversation className="relative min-h-0 w-full flex-1 bg-black">
+            <ConversationContent className="mx-auto w-full max-w-[760px] space-y-4 px-4 py-4">
               {messages.map((message) => (
                 <Message key={message.id} message={message} />
               ))}
@@ -138,26 +160,36 @@ export function Chat({ className }: Props) {
           </Conversation>
 
           <form
-            className="flex items-center p-2 space-x-1 border-t border-primary/18 bg-background"
-            onSubmit={async (event) => {
-              event.preventDefault();
-              validateAndSubmitMessage(input);
-            }}
+            className="shrink-0 border-t border-[#242424] bg-black p-2.5"
+            onSubmit={handleSubmit}
           >
-            <Settings />
-            <ModelSelector />
-            <Input
-              className="w-full font-mono text-sm rounded-sm border-0 bg-background"
-              disabled={status === "streaming" || status === "submitted"}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Type your message..."
-              value={input}
-            />
-            <Button type="submit" disabled={status !== "ready" || !input.trim()}>
-              <SendIcon className="w-4 h-4" />
-            </Button>
+            <div className="rounded-xl border border-[#2b2b2b] bg-[#111111] px-2 pt-2 pb-2">
+              <Input
+                aria-label="Ask a follow-up"
+                className="h-9 border-0 bg-transparent px-2 text-sm text-zinc-100 shadow-none placeholder:text-zinc-600 focus-visible:ring-0"
+                disabled={isBusy}
+                onChange={(event) => setInput(event.target.value)}
+                placeholder="Ask a follow-up..."
+                value={input}
+              />
+              <div className="mt-1 flex items-center gap-1">
+                <Settings />
+                <div className="min-w-0 [&_[data-slot=select-trigger]]:h-7 [&_[data-slot=select-trigger]]:border-transparent [&_[data-slot=select-trigger]]:bg-transparent [&_[data-slot=select-trigger]]:px-1.5 [&_[data-slot=select-trigger]]:text-xs [&_[data-slot=select-trigger]]:text-zinc-400 [&_[data-slot=select-trigger]]:shadow-none hover:[&_[data-slot=select-trigger]]:bg-white/5">
+                  <ModelSelector className="border-transparent" />
+                </div>
+                <Button
+                  aria-label="Send follow-up"
+                  className="ml-auto size-7 shrink-0 rounded-md bg-zinc-100 text-black hover:bg-white disabled:bg-[#2a2a2a] disabled:text-zinc-600"
+                  disabled={status !== "ready" || !input.trim()}
+                  size="icon"
+                  type="submit"
+                >
+                  <Send className="size-3.5" aria-hidden="true" />
+                </Button>
+              </div>
+            </div>
           </form>
-        </>
+        </div>
       )}
     </Panel>
   );

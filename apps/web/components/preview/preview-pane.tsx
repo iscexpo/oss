@@ -101,72 +101,74 @@ export function PreviewPane({ className, disabled }: Props) {
 
   return (
     <Panel className={className}>
-      <PanelHeader>
-        <div className="absolute flex items-center space-x-1">
+      <PanelHeader className="relative justify-center px-2">
+        <div className="absolute left-1 flex items-center">
           <a
             href={sandboxUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="cursor-pointer px-1"
+            className="cursor-pointer rounded p-1 text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-200"
             title="Open the sandbox preview in a new tab"
           >
-            <CompassIcon className="w-4" />
+            <CompassIcon className="size-3.5" />
           </a>
           <button
             type="button"
             onClick={openInNewTab}
-            className="cursor-pointer px-1"
+            className="cursor-pointer rounded p-1 text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-200"
             title="Open the sandbox preview in a new tab"
           >
-            <ExternalLinkIcon className="w-4" />
+            <ExternalLinkIcon className="size-3.5" />
           </button>
           <button
             type="button"
             onClick={refreshIframe}
-            className={cn("cursor-pointer px-1", { "animate-spin": isLoading })}
+            className={cn(
+              "cursor-pointer rounded p-1 text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-200",
+              { "animate-spin": isLoading },
+            )}
             title="Reload the preview"
           >
-            <RefreshCwIcon className="w-4" />
+            <RefreshCwIcon className="size-3.5" />
           </button>
           {manualSrc && (
             <button
               type="button"
               onClick={() => setManualSrc(undefined)}
-              className="cursor-pointer px-1"
+              className="cursor-pointer rounded p-1 text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-200"
               title="Return to the sandbox preview"
             >
-              <XIcon className="w-4" />
+              <XIcon className="size-3.5" />
             </button>
           )}
         </div>
 
-        <div className="m-auto h-6">
-          <input
-            type="text"
-            className="font-mono text-xs h-6 border border-gray-200 px-4 bg-white rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-w-[300px]"
-            onChange={(event) => setAddress(event.target.value)}
-            onClick={(event) => event.currentTarget.select()}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                event.currentTarget.blur();
-                navigateTo();
-              }
-            }}
-            value={address}
-            placeholder="Preview URL"
-          />
-        </div>
+        <input
+          type="text"
+          aria-label="Preview URL"
+          className="h-7 w-full max-w-md rounded-md border border-[#2a2a2a] bg-[#111111] px-3 text-center font-mono text-xs text-zinc-300 outline-none placeholder:text-zinc-600 focus:border-[#3a3a3a]"
+          onChange={(event) => setAddress(event.target.value)}
+          onClick={(event) => event.currentTarget.select()}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.currentTarget.blur();
+              navigateTo();
+            }
+          }}
+          value={address}
+          placeholder="/"
+        />
       </PanelHeader>
 
-      <div className="flex h-[calc(100%-2rem-1px)] relative">
+      <div className="relative flex h-[calc(100%-2.5rem-1px)] bg-black">
         {!sandboxId && (
-          <div className="flex items-center justify-center w-full h-full font-mono text-sm text-muted-foreground">
+          <div className="flex h-full w-full items-center justify-center px-8 text-center text-[13px] text-zinc-500">
             Run the agent to generate an app — its live preview will appear here.
           </div>
         )}
 
         {!proxyOrigin && sandboxId && (
-          <div className="flex items-center justify-center w-full h-full font-mono text-sm text-muted-foreground">
+          <div className="flex h-full w-full items-center justify-center px-8 text-center font-mono text-xs text-zinc-500">
             Preview proxy is not configured. Set VIBE_PREVIEW_PROXY_URL and restart.
           </div>
         )}
@@ -178,7 +180,7 @@ export function PreviewPane({ className, disabled }: Props) {
                 key={frameKey}
                 ref={iframeRef}
                 src={effectiveSrc}
-                className="w-full h-full"
+                className="h-full w-full bg-black"
                 onLoad={() => {
                   setIsLoading(false);
                   setError(null);
@@ -192,17 +194,17 @@ export function PreviewPane({ className, disabled }: Props) {
             </ScrollArea>
 
             {isLoading && !error && (
-              <div className="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center flex-col gap-2">
-                <BarLoader color="#666" />
-                <span className="text-gray-500 text-xs">Loading...</span>
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/90">
+                <BarLoader color="#71717a" />
+                <span className="text-xs text-zinc-500">Loading...</span>
               </div>
             )}
 
             {error && (
-              <div className="absolute inset-0 bg-white flex items-center justify-center flex-col gap-2">
-                <span className="text-red-500">Failed to load page</span>
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black">
+                <span className="text-sm text-red-400">Failed to load page</span>
                 <button
-                  className="text-blue-500 hover:underline text-sm"
+                  className="text-sm text-zinc-200 underline underline-offset-4 hover:text-white"
                   type="button"
                   onClick={refreshIframe}
                 >

@@ -5,5 +5,5 @@ import { useSandboxStore } from "./state";
 
 export function TerminalSurface({ className }: { className?: string }) {
   const { commands } = useSandboxStore();
-  return <CommandsLogs className={className} commands={commands} />;
+  return <CommandsLogs bare className={className} commands={commands} />;
 }

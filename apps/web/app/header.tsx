@@ -1,10 +1,10 @@
+"use client";
+
 import { ToggleWelcome } from "@/components/modals/welcome";
-import { VercelDashed } from "@/components/icons/vercel-dashed";
 import { cn } from "@/lib/utils";
-import { useTabState } from "@/components/tabs/use-tab-state";
-import { SurfaceTab } from "@/components/tabs/use-tab-state";
+import { useTabState, type SurfaceTab } from "@/components/tabs/use-tab-state";
 import { Button } from "@/components/ui/button";
-import { GitBranch, Rocket, Menu } from "lucide-react";
+import { ChevronDown, Ellipsis, GitBranch, Lock, Plus, Star } from "lucide-react";
 
 const SURFACE_TABS: { id: SurfaceTab; label: string }[] = [
   { id: "preview", label: "Preview" },
@@ -22,47 +22,83 @@ export function Header({ className }: Props) {
   const [activeTab, setTab] = useTabState();
 
   return (
-    <header className={cn("flex items-center justify-between px-3 h-11 border-b border-border bg-background shrink-0", className)}>
-      <div className="flex items-center gap-3">
-        <button className="md:hidden p-1 rounded hover:bg-accent">
-          <Menu className="w-4 h-4" />
-        </button>
-        <div className="flex items-center gap-1.5">
-          <VercelDashed className="ml-0.5 mr-1" />
-          <span className="text-sm font-bold tracking-tight">OSS Vibe Coding Platform</span>
-        </div>
-        <div className="hidden md:flex items-center gap-1 ml-4">
-          <span className="text-xs font-mono text-muted-foreground bg-secondary px-2 py-0.5 rounded">
-            my-project
-          </span>
-          <span className="text-xs font-mono text-muted-foreground flex items-center gap-1">
-            <GitBranch className="w-3 h-3" /> main
-          </span>
-        </div>
+    <header
+      className={cn(
+        "flex h-12 w-full shrink-0 items-center gap-2 border-b border-[#242424] bg-black px-2 text-xs text-zinc-300",
+        className,
+      )}
+    >
+      <div className="flex min-w-0 items-center gap-1.5">
+        <span className="flex items-center gap-1.5 rounded-md px-1.5 py-1 text-[13px] font-medium text-zinc-100">
+          <Star className="size-3.5 text-zinc-500" aria-hidden="true" />
+          <span className="truncate">V0 clone</span>
+          <Lock className="size-3 text-zinc-600" aria-hidden="true" />
+          <ChevronDown className="size-3.5 text-zinc-500" aria-hidden="true" />
+        </span>
+        <span className="hidden items-center gap-1.5 rounded-md border border-[#2a2a2a] bg-[#111111] px-2 py-1 font-mono text-[11px] text-zinc-400 lg:flex">
+          <GitBranch className="size-3 text-zinc-500" aria-hidden="true" />
+          <span className="max-w-44 truncate">main</span>
+        </span>
       </div>
 
-      <nav className="flex items-center gap-0.5">
-        {SURFACE_TABS.map(({ id, label }) => (
+      <nav aria-label="Work surface" className="mx-auto hidden min-w-0 items-center md:flex">
+        <div className="flex min-w-0 items-center overflow-x-auto rounded-lg border border-[#2a2a2a] bg-[#111111] p-0.5">
+          {SURFACE_TABS.map(({ id, label }) => {
+            const isActive = activeTab === id;
+            return (
+              <button
+                key={id}
+                aria-current={isActive ? "page" : undefined}
+                onClick={() => {
+                  void setTab(id);
+                }}
+                type="button"
+                className={cn(
+                  "shrink-0 rounded-md px-3 py-1 text-xs font-medium transition-colors",
+                  isActive
+                    ? "bg-[#1d1d1d] text-zinc-50 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]"
+                    : "text-zinc-500 hover:bg-white/5 hover:text-zinc-200",
+                )}
+              >
+                {label}
+              </button>
+            );
+          })}
           <button
-            key={id}
-            onClick={() => setTab(id)}
-            className={cn(
-              "px-3 py-1 text-xs font-medium rounded transition-colors",
-              activeTab === id
-                ? "bg-accent text-foreground"
-                : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-            )}
+            aria-label="Add surface"
+            className="ml-0.5 flex size-7 shrink-0 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-white/5 hover:text-zinc-200"
+            type="button"
           >
-            {label}
+            <Plus className="size-3.5" aria-hidden="true" />
           </button>
-        ))}
+        </div>
       </nav>
 
-      <div className="flex items-center gap-2">
+      <div className="ml-auto flex shrink-0 items-center gap-1.5 md:ml-0">
+        <Button
+          aria-label="More workspace actions"
+          className="size-7 text-zinc-400 hover:bg-white/5 hover:text-zinc-200"
+          size="icon"
+          type="button"
+          variant="ghost"
+        >
+          <Ellipsis className="size-4" aria-hidden="true" />
+        </Button>
+        <Button
+          className="h-7 rounded-md border-[#2a2a2a] bg-transparent px-2.5 text-xs font-medium text-zinc-200 hover:bg-white/5"
+          size="sm"
+          type="button"
+          variant="outline"
+        >
+          Invite
+        </Button>
         <ToggleWelcome />
-        <Button variant="outline" size="sm" className="h-7 text-xs gap-1">
-          <Rocket className="w-3 h-3" />
-          <span className="hidden sm:inline">Publish</span>
+        <Button
+          className="h-7 rounded-md bg-zinc-100 px-3 text-xs font-semibold text-black hover:bg-white"
+          size="sm"
+          type="button"
+        >
+          Publish
         </Button>
       </div>
     </header>

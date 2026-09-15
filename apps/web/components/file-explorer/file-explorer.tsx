@@ -119,16 +119,19 @@ export const FileExplorer = memo(function FileExplorer({
 
   return (
     <Panel className={className}>
-      <PanelHeader>
-        <FileIcon className="w-4 mr-2" />
-        <span className="font-mono uppercase font-semibold">Sandbox Remote Filesystem</span>
-        <span className="ml-auto flex items-center gap-2">
+      <PanelHeader className="gap-2 px-2 text-[11px] tracking-wide text-zinc-500 uppercase">
+        <FileIcon className="size-3.5" />
+        <span className="font-medium">Sandbox Remote Filesystem</span>
+        <span className="ml-auto flex items-center gap-1.5 normal-case">
           {selected && !disabled && (
-            <span className="text-gray-500 max-w-52 truncate">{selected.path}</span>
+            <span className="max-w-52 truncate font-mono text-[11px] text-zinc-500">
+              {selected.path}
+            </span>
           )}
           <Button
             size="sm"
             variant="outline"
+            className="h-7 border-[#2a2a2a] bg-transparent px-2 text-xs font-medium text-zinc-300 hover:bg-white/5"
             disabled={disabled || !sandboxId || vscodeLoading}
             onClick={openVSCode}
             title="Open the sandbox file system in VS Code (code-server)"
@@ -180,8 +183,8 @@ export const FileExplorer = memo(function FileExplorer({
         </span>
       </PanelHeader>
 
-      <div className="flex text-sm h-[calc(100%-2rem-1px)]">
-        <ScrollArea className="w-1/4 border-r border-primary/18 flex-shrink-0">
+      <div className="flex h-[calc(100%-2.5rem-1px)] bg-black text-[13px] text-zinc-300">
+        <ScrollArea className="w-1/4 flex-shrink-0 border-r border-[#242424]">
           <div>{renderFileTree(fs)}</div>
         </ScrollArea>
         {selected && sandboxId && !disabled && (
@@ -222,25 +225,28 @@ const FileTreeNode = memo(function FileTreeNode({
   return (
     <div>
       <div
-        className={cn(`flex items-center py-0.5 px-1 hover:bg-gray-100 cursor-pointer`, {
-          "bg-gray-200/80": selected?.path === node.path,
-        })}
+        className={cn(
+          `flex cursor-pointer items-center px-1 py-1 text-zinc-400 transition-colors hover:bg-white/5 hover:text-zinc-100`,
+          {
+            "bg-white/10 text-zinc-100": selected?.path === node.path,
+          },
+        )}
         style={{ paddingLeft: `${depth * 16 + 8}px` }}
         onClick={handleClick}
       >
         {node.type === "folder" ? (
           <>
             {node.expanded ? (
-              <ChevronDownIcon className="w-4 mr-1" />
+              <ChevronDownIcon className="mr-1 size-3.5 text-zinc-600" />
             ) : (
-              <ChevronRightIcon className="w-4 mr-1" />
+              <ChevronRightIcon className="mr-1 size-3.5 text-zinc-600" />
             )}
-            <FolderIcon className="w-4 mr-2" />
+            <FolderIcon className="mr-2 size-3.5 text-zinc-500" />
           </>
         ) : (
           <>
-            <div className="w-4 mr-1" />
-            <FileIcon className="w-4 mr-2 " />
+            <div className="mr-1 w-4" />
+            <FileIcon className="mr-2 size-3.5 text-zinc-500" />
           </>
         )}
         <span className="">{node.name}</span>

@@ -8,12 +8,7 @@ interface Props {
 
 export function Panel({ className, children }: Props) {
   return (
-    <div
-      className={cn(
-        "flex flex-col relative border border-primary/18 w-full h-full shadow-sm rounded-sm",
-        className,
-      )}
-    >
+    <div className={cn("relative flex h-full w-full min-h-0 flex-col bg-black", className)}>
       {children}
     </div>
   );
@@ -23,7 +18,7 @@ export function PanelHeader({ className, children }: Props) {
   return (
     <div
       className={cn(
-        "text-sm flex items-center border-b border-primary/18 px-2.5 py-1.5 text-secondary-foreground bg-secondary",
+        "flex h-10 shrink-0 items-center border-b border-[#242424] bg-black px-3 text-xs font-medium text-zinc-400",
         className,
       )}
     >

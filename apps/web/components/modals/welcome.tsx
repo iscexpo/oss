@@ -77,8 +77,15 @@ export function Welcome(props: { onDismissAction(): void; defaultOpen: boolean }
 export function ToggleWelcome() {
   const { open, setOpen } = useWelcomeStore();
   return (
-    <Button className="cursor-pointer" onClick={() => setOpen(!open)} variant="outline" size="sm">
-      <InfoIcon /> <span className="hidden lg:inline">What&apos;s this?</span>
+    <Button
+      aria-label="About this workspace"
+      className="size-7 cursor-pointer text-zinc-400 hover:bg-white/5 hover:text-zinc-200"
+      onClick={() => setOpen(!open)}
+      size="icon"
+      type="button"
+      variant="ghost"
+    >
+      <InfoIcon className="size-4" aria-hidden="true" />
     </Button>
   );
 }

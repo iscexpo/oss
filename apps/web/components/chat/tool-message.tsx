@@ -5,7 +5,7 @@ export function ToolMessage(props: { className?: string; children: ReactNode }) 
   return (
     <div
       className={cn(
-        "text-sm px-3.5 py-3 border border-border bg-background rounded-md font-mono",
+        "rounded-xl border border-[#2b2b2b] bg-[#111111] px-3.5 py-3 font-mono text-[13px] leading-6 text-zinc-300",
         props.className,
       )}
     >

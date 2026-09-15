@@ -25,11 +25,11 @@ export function Reasoning({ part, partIndex }: { part: ReasoningUIPart; partInde
 
   return (
     <div
-      className="text-sm border border-border bg-background rounded-md cursor-pointer hover:bg-accent/30 transition-colors"
+      className="cursor-pointer rounded-xl border border-[#2b2b2b] bg-[#111111] transition-colors hover:bg-white/5"
       onClick={handleClick}
     >
       <div className="px-3 py-2">
-        <div className="text-secondary-foreground font-mono leading-normal">
+        <div className="font-mono text-[13px] leading-6 text-zinc-400">
           {isExpanded || !hasMoreContent ? (
             <Streamdown>{text}</Streamdown>
           ) : (
