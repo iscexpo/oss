@@ -66,6 +66,7 @@
     "@types/react-dom": "^19",
     "@types/react-syntax-highlighter": "15.5.13",
     "@vitest/coverage-v8": "^5.0.0",
+    "baseline-browser-mapping": "^2.11.25",
     "jsdom": "^30.0.1",
     "msw": "^2.15.0",
     "raw-loader": "4.0.2",
