@@ -1,6 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "relatedProjects": ["vibe-coding-sandbox-proxy"],
   "installCommand": "cd ../.. && pnpm install",
   "buildCommand": "next build"
 }

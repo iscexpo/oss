@@ -2,10 +2,10 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "builds": [
     {
-      "src": "package.json",
+      "src": "apps/web/package.json",
       "use": "@vercel/next"
     }
   ],
-  "installCommand": "cd ../.. && pnpm install",
-  "buildCommand": "next build"
+  "installCommand": "pnpm install",
+  "buildCommand": "pnpm --filter @vibe-coding/web build"
 }
