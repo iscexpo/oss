@@ -118,6 +118,7 @@ export function Chat({ className }: Props) {
           aria-label="Enhance prompt"
           title="Enhance prompt"
           disabled={!input.trim() || status !== "ready"}
+          onClick={() => setInput(`Improve this prompt: ${input.trim()}`)}
         >
           <SparklesIcon className="w-4 h-4" />
         </Button>
