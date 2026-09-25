@@ -116,8 +116,8 @@ export function Chat({ className }: Props) {
   }, []);
 
   return (
-    <Panel className={cn("overflow-hidden rounded-md border-primary/20 bg-background/95 shadow-sm", className)}>
-      <PanelHeader>
+    <Panel className={cn("overflow-hidden rounded-xl border-border/70 bg-background shadow-[0_12px_40px_-24px_hsl(var(--foreground)/0.35)]", className)}>
+      <PanelHeader className="h-10 shrink-0 border-b border-border/60 bg-muted/20 px-3">
         <div className="flex items-center font-mono font-semibold uppercase">
           <MessageCircleIcon className="mr-2 w-4" />
           Chat
@@ -128,7 +128,7 @@ export function Chat({ className }: Props) {
       {/* Messages Area */}
       {messages.length === 0 ? (
         <div className="flex-1 min-h-0">
-          <div className="flex flex-col items-center justify-center h-full gap-2 px-4 font-mono text-sm text-muted-foreground">
+          <div className="flex flex-col items-center justify-center h-full gap-3 px-4 font-mono text-sm text-muted-foreground">
             <p className="font-semibold text-center">Click and try one of these prompts:</p>
             <ul className="flex flex-col w-full max-w-xl gap-1 text-center">
               {TEST_PROMPTS.map((prompt, idx) => (
@@ -136,7 +136,7 @@ export function Chat({ className }: Props) {
                   key={idx}
                   role="button"
                   tabIndex={0}
-                  className="w-full px-4 py-2 border border-dashed rounded-sm shadow-sm cursor-pointer border-border bg-background/50 transition-colors hover:bg-secondary/50 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="w-full rounded-md border border-dashed border-border/80 bg-muted/10 px-4 py-2.5 shadow-sm transition-colors hover:border-primary/40 hover:bg-muted/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   onClick={() => validateAndSubmitMessage(prompt)}
                   onKeyDown={(event) => {
                     if (event.key === "Enter" || event.key === " ") {
@@ -163,7 +163,7 @@ export function Chat({ className }: Props) {
       )}
 
       <form
-        className="flex items-center p-2 space-x-1 border-t border-primary/18 bg-background"
+        className="flex items-center gap-1.5 border-t border-border/60 bg-muted/10 p-2"
         onSubmit={async (event) => {
           event.preventDefault();
           validateAndSubmitMessage(input);
