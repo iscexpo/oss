@@ -137,19 +137,6 @@ export async function listSandboxRecords(): Promise<SandboxRecord[]> {
   return rows as unknown as SandboxRecord[]
 }
 
-export async function getSandboxRecord(
-  sandboxId: string
-): Promise<SandboxRecord | null> {
-  await ensureSchema()
-  const { rows } = await sql`
-    SELECT id, project_id AS "projectId", status, created_at AS "createdAt",
-           last_checked_at AS "lastCheckedAt"
-    FROM sandboxes
-    WHERE id = ${sandboxId}
-  `
-  return (rows[0] as unknown as SandboxRecord) ?? null
-}
-
 export async function recordSandbox(sandboxId: string): Promise<void> {
   await ensureSchema()
   await sql`

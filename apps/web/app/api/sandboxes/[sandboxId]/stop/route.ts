@@ -9,9 +9,9 @@ interface RouteContext {
 }
 
 export async function POST(request: NextRequest, context: RouteContext) {
-  const botResult = await checkBotId(request)
-  if (botResult) {
-    return NextResponse.json({ error: 'bot request blocked.' }, { status: 403 })
+  const checkResult = await checkBotId()
+  if (checkResult.isBot) {
+    return NextResponse.json({ error: 'Bot detected' }, { status: 403 })
   }
 
   const { sandboxId } = await context.params

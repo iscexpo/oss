@@ -2,7 +2,7 @@
 
 import type { ChatUIMessage } from "@/components/chat/types";
 import { TEST_PROMPTS } from "@/ai/constants";
-import { MessageCircleIcon, SendIcon } from "lucide-react";
+import { MessageCircleIcon, SendIcon, SparklesIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Conversation,
@@ -110,6 +110,17 @@ export function Chat({ className }: Props) {
           placeholder="Type your message..."
           value={input}
         />
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="shrink-0"
+          aria-label="Enhance prompt"
+          title="Enhance prompt"
+          disabled={!input.trim() || status !== "ready"}
+        >
+          <SparklesIcon className="w-4 h-4" />
+        </Button>
         <Button type="submit" disabled={status !== "ready" || !input.trim()}>
           <SendIcon className="w-4 h-4" />
         </Button>
