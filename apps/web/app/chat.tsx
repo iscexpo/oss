@@ -2,7 +2,7 @@
 
 import type { ChatUIMessage } from "@/components/chat/types";
 import { TEST_PROMPTS } from "@/ai/constants";
-import { MessageCircleIcon, SendIcon, SparklesIcon } from "lucide-react";
+import { LightbulbIcon, MessageCircleIcon, SendIcon, SparklesIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Conversation,
@@ -20,6 +20,18 @@ import { useCallback, useEffect } from "react";
 import { useSharedChatContext } from "@/lib/chat-context";
 import { useSettings } from "@/components/settings/use-settings";
 import { useSandboxStore } from "./state";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+
+const PROMPT_FEATURES = [
+  ["Structure prompting", "Define the task, constraints, and output format."],
+  ["Few-shot examples", "Show an input and ideal output to guide the model."],
+  ["Clear delimiters", "Separate context from instructions with clear markers."],
+  ["Prompt variables", "Turn a prompt into a reusable template."],
+  ["Structured JSON", "Request predictable JSON for application workflows."],
+  ["Multimodal context", "Attach screenshots, mockups, or documents."],
+  ["Model comparison", "Try the same prompt across different models."],
+  ["Grounding and export", "Use current sources or export API-ready code."],
+] as const;
 
 interface Props {
   className: string;
@@ -110,6 +122,36 @@ export function Chat({ className }: Props) {
           placeholder="Type your message..."
           value={input}
         />
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="shrink-0"
+              aria-label="Suggested prompt features"
+              title="Suggested prompt features"
+            >
+              <LightbulbIcon className="w-4 h-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent align="end" className="w-80 p-3 font-mono">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide">Suggested features</p>
+            <div className="grid gap-1">
+              {PROMPT_FEATURES.map(([title, description]) => (
+                <button
+                  key={title}
+                  type="button"
+                  className="rounded-sm px-2 py-1.5 text-left transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  onClick={() => setInput(`${title}: ${input}`)}
+                >
+                  <span className="block text-xs font-semibold">{title}</span>
+                  <span className="block text-[11px] text-muted-foreground">{description}</span>
+                </button>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
         <Button
           type="button"
           variant="ghost"
