@@ -68,7 +68,7 @@ export function Chat({ className }: Props) {
                   key={idx}
                   role="button"
                   tabIndex={0}
-                  className="w-full px-4 py-2 border border-dashed rounded-sm shadow-sm cursor-pointer border-border hover:bg-secondary/50 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="w-full px-4 py-2 border border-dashed rounded-sm shadow-sm cursor-pointer border-border bg-background/50 transition-colors hover:bg-secondary/50 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   onClick={() => validateAndSubmitMessage(prompt)}
                   onKeyDown={(event) => {
                     if (event.key === "Enter" || event.key === " ") {

@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { Sandbox } from '@vercel/sandbox'
 import { checkBotId } from 'botid/server'
 import { VSCODE_PORT } from '@/lib/vscode'
+import { trackSandbox } from '@/lib/sandboxes/registry'
 import z from 'zod/v3'
 
 const TARBALL_EXTENSIONS = ['.zip', '.tar', '.tar.gz', '.tgz']
@@ -85,6 +86,8 @@ export async function POST(request: NextRequest) {
       ports: [VSCODE_PORT],
       source: buildSource(result.data.repo),
     })
+
+    void trackSandbox(sandbox.sandboxId)
 
     const paths = await listFiles(sandbox)
 

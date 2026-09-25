@@ -216,6 +216,8 @@ export async function POST(request: NextRequest) {
       ports: [VSCODE_PORT],
     })
 
+    void trackSandbox(sandbox.sandboxId)
+
     await sandbox.writeFiles(extracted.writeFiles)
 
     return NextResponse.json({
