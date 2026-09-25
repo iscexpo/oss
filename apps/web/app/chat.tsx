@@ -31,6 +31,7 @@ import { useSharedChatContext } from "@/lib/chat-context";
 import { useSettings } from "@/components/settings/use-settings";
 import { useSandboxStore } from "./state";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 const PROMPT_FEATURES = [
   {
@@ -115,7 +116,7 @@ export function Chat({ className }: Props) {
   }, []);
 
   return (
-    <Panel className={className}>
+    <Panel className={cn("overflow-hidden rounded-md border-primary/20 bg-background/95 shadow-sm", className)}>
       <PanelHeader>
         <div className="flex items-center font-mono font-semibold uppercase">
           <MessageCircleIcon className="mr-2 w-4" />

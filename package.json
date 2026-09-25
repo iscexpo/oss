@@ -7,9 +7,9 @@
     "node": "22.x"
   },
   "scripts": {
-    "dev": "dotenv -e .env.local -- turbo run dev",
+    "dev": "dotenv -e .env.local -e .env.development.local -- turbo run dev",
     "build": "dotenv -e .env.local -- turbo run build",
-    "start": "dotenv -e .env.local -- turbo run start",
+    "start": "dotenv -e .env.local -e .env.development.local -- turbo run start",
     "typecheck": "turbo run typecheck",
     "format": "oxfmt apps/**/*.{ts,tsx,js,jsx,json,css,md}"
   },
