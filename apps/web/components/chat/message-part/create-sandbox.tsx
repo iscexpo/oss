@@ -10,6 +10,8 @@ interface Props {
 }
 
 export function CreateSandbox({ message }: Props) {
+  const failureContext = `Failed to create sandbox: ${message.error?.message ?? "Unknown error"}`;
+
   return (
     <ToolMessage>
       <ToolHeader>
@@ -25,7 +27,7 @@ export function CreateSandbox({ message }: Props) {
           )}
         </Spinner>
         <div className="flex flex-wrap items-center gap-2">
-          <span>
+          <span className={message.status === "error" ? "text-red-700" : undefined}>
             {message.status === "done" && "Sandbox created successfully"}
             {message.status === "loading" && "Creating Sandbox"}
             {message.status === "error" && "Failed to create sandbox"}
@@ -37,9 +39,11 @@ export function CreateSandbox({ message }: Props) {
               variant="outline"
               className="h-7 px-2 text-xs"
               onClick={() => {
-                window.dispatchEvent(new CustomEvent("v0-auto-fix-request", {
-                  detail: { message: "Failed to create sandbox" },
-                }));
+                window.dispatchEvent(
+                  new CustomEvent("v0-auto-fix-request", {
+                    detail: { message: failureContext },
+                  }),
+                );
               }}
             >
               <SparklesIcon className="h-3.5 w-3.5" />

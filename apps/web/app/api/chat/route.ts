@@ -14,14 +14,17 @@ import { checkBotId } from 'botid/server'
 import { tools } from '@/ai/tools'
 import prompt from './prompt.md'
 
+type AutonomyMode = 'agent' | 'editor'
+
 interface BodyData {
   messages: ChatUIMessage[]
   modelId?: string
   reasoningEffort?: 'low' | 'medium'
+  autonomyMode?: AutonomyMode
 }
 
 export async function POST(req: Request) {
-  const [checkResult, { messages, modelId = DEFAULT_MODEL, reasoningEffort }] =
+  const [checkResult, { messages, modelId = DEFAULT_MODEL, reasoningEffort, autonomyMode = 'agent' }] =
     await Promise.all([checkBotId(), req.json() as Promise<BodyData>])
 
   if (checkResult.isBot) {
@@ -35,13 +38,17 @@ export async function POST(req: Request) {
     )
   }
 
+  const modeInstructions = autonomyMode === 'editor'
+    ? `\n\nEDITOR MODE:\n- Act as an autonomous implementation editor. Inspect the existing project before changing it.\n- Prefer precise, minimal file edits over explanations.\n- Use the available sandbox and file tools to implement the requested change, then run the narrowest useful validation.\n- Never overwrite unrelated work or regenerate existing files without need.\n- Report changed files and validation results after completing the work.`
+    : `\n\nAGENT MODE:\n- Act as an autonomous coding agent. Break the request into concrete steps and execute them with the available tools.\n- Inspect before editing, preserve existing work, and recover from errors with targeted fixes.\n- Continue through implementation and validation instead of stopping at a plan.\n- Summarize completed work and any remaining blocker only after the workflow is complete.`
+
   return createUIMessageStreamResponse({
     stream: createUIMessageStream({
       originalMessages: messages,
       execute: async ({ writer }) => {
         const result = streamText({
           ...getModelOptions(modelId, { reasoningEffort }),
-system: prompt,
+system: `${prompt}${modeInstructions}`,
             messages: await convertToModelMessages(toModelMessages(messages)),
             stopWhen: stepCountIs(20),
           tools: tools({ modelId, writer }),
