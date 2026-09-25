@@ -74,6 +74,7 @@ export function Chat({ className }: Props) {
   const { setChatStatus } = useSandboxStore();
   const [planMode, setPlanMode] = useState(false);
   const [autoPermission, setAutoPermission] = useState(false);
+  const [autonomyMode, setAutonomyMode] = useState<"agent" | "editor">("agent");
   const [previewContext, setPreviewContext] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -83,12 +84,12 @@ export function Chat({ className }: Props) {
         const contextualText = previewContext
           ? `${text}\n\n[Selected preview context]\n${previewContext}`
           : text;
-        sendMessage({ text: contextualText }, { body: { modelId, reasoningEffort } });
+        sendMessage({ text: contextualText }, { body: { modelId, reasoningEffort, autonomyMode } });
         setInput("");
         setPreviewContext(null);
       }
     },
-    [sendMessage, modelId, setInput, reasoningEffort, previewContext],
+    [sendMessage, modelId, setInput, reasoningEffort, previewContext, autonomyMode],
   );
 
   useEffect(() => {
@@ -169,6 +170,17 @@ export function Chat({ className }: Props) {
       >
         <Settings />
         <ModelSelector />
+        <label className="sr-only" htmlFor="autonomy-mode">Autonomy mode</label>
+        <select
+          id="autonomy-mode"
+          value={autonomyMode}
+          onChange={(event) => setAutonomyMode(event.target.value as "agent" | "editor")}
+          className="h-9 shrink-0 rounded-sm border border-border bg-background px-2 font-mono text-xs"
+          title="Choose autonomous agent or editor mode"
+        >
+          <option value="agent">Agent</option>
+          <option value="editor">Editor</option>
+        </select>
         <Input
           className="w-full font-mono text-sm rounded-sm border-0 bg-background"
           disabled={status === "streaming" || status === "submitted"}
