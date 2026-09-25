@@ -74,21 +74,35 @@ export function Chat({ className }: Props) {
   const { setChatStatus } = useSandboxStore();
   const [planMode, setPlanMode] = useState(false);
   const [autoPermission, setAutoPermission] = useState(false);
+  const [previewContext, setPreviewContext] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const validateAndSubmitMessage = useCallback(
     (text: string) => {
       if (text.trim()) {
-        sendMessage({ text }, { body: { modelId, reasoningEffort } });
+        const contextualText = previewContext
+          ? `${text}\n\n[Selected preview context]\n${previewContext}`
+          : text;
+        sendMessage({ text: contextualText }, { body: { modelId, reasoningEffort } });
         setInput("");
+        setPreviewContext(null);
       }
     },
-    [sendMessage, modelId, setInput, reasoningEffort],
+    [sendMessage, modelId, setInput, reasoningEffort, previewContext],
   );
 
   useEffect(() => {
     setChatStatus(status);
   }, [status, setChatStatus]);
+
+  useEffect(() => {
+    const onPreviewContext = (event: Event) => {
+      const detail = (event as CustomEvent<{ kind: string; data: unknown }>).detail;
+      setPreviewContext(JSON.stringify(detail));
+    };
+    window.addEventListener("v0-preview-context", onPreviewContext);
+    return () => window.removeEventListener("v0-preview-context", onPreviewContext);
+  }, []);
 
   return (
     <Panel className={className}>
