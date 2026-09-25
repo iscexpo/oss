@@ -2,7 +2,17 @@
 
 import type { ChatUIMessage } from "@/components/chat/types";
 import { TEST_PROMPTS } from "@/ai/constants";
-import { LightbulbIcon, MessageCircleIcon, SendIcon, SparklesIcon } from "lucide-react";
+import {
+  PaperclipIcon,
+  BookOpenIcon,
+  FileTextIcon,
+  LightbulbIcon,
+  MessageCircleIcon,
+  NetworkIcon,
+  SendIcon,
+  Settings2Icon,
+  SparklesIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Conversation,
@@ -16,7 +26,7 @@ import { Panel, PanelHeader } from "@/components/panels/panels";
 import { Settings } from "@/components/settings/settings";
 import { useChat } from "@ai-sdk/react";
 import { useLocalStorageValue } from "@/lib/use-local-storage-value";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSharedChatContext } from "@/lib/chat-context";
 import { useSettings } from "@/components/settings/use-settings";
 import { useSandboxStore } from "./state";
@@ -62,6 +72,9 @@ export function Chat({ className }: Props) {
   const { modelId, reasoningEffort } = useSettings();
   const { messages, sendMessage, status } = useChat<ChatUIMessage>({ chat });
   const { setChatStatus } = useSandboxStore();
+  const [planMode, setPlanMode] = useState(false);
+  const [autoPermission, setAutoPermission] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const validateAndSubmitMessage = useCallback(
     (text: string) => {
@@ -190,6 +203,46 @@ export function Chat({ className }: Props) {
           onClick={() => setInput(`Improve this prompt: ${input.trim()}`)}
         >
           <SparklesIcon className="w-4 h-4" />
+        </Button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          className="sr-only"
+          aria-label="Attach a file"
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            if (file) setInput(`${input}${input ? "\n" : ""}[Attached file: ${file.name}]`);
+          }}
+        />
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button type="button" variant="ghost" size="icon" className="shrink-0" aria-label="Composer tools" title="Composer tools">
+              <Settings2Icon className="h-4 w-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent align="end" className="w-72 p-2 font-mono">
+            <p className="px-2 pb-2 text-xs font-semibold uppercase tracking-wide">Composer tools</p>
+            <div className="grid gap-1">
+              <Button type="button" variant="ghost" className="justify-start gap-2" onClick={() => setPlanMode((value) => !value)} aria-pressed={planMode}>
+                <BookOpenIcon className="h-4 w-4" /> Plan mode <span className="ml-auto text-xs text-muted-foreground">{planMode ? "On" : "Off"}</span>
+              </Button>
+              <Button type="button" variant="ghost" className="justify-start gap-2" onClick={() => setAutoPermission((value) => !value)} aria-pressed={autoPermission}>
+                <Settings2Icon className="h-4 w-4" /> Auto permission <span className="ml-auto text-xs text-muted-foreground">{autoPermission ? "On" : "Off"}</span>
+              </Button>
+              <Button type="button" variant="ghost" className="justify-start gap-2" onClick={() => setInput(`Skills: ${input}`)}>
+                <BookOpenIcon className="h-4 w-4" /> Skills
+              </Button>
+              <Button type="button" variant="ghost" className="justify-start gap-2" onClick={() => setInput(`MCP tools: ${input}`)}>
+                <NetworkIcon className="h-4 w-4" /> MCP
+              </Button>
+              <Button type="button" variant="ghost" className="justify-start gap-2" onClick={() => setInput(`Instructions: ${input}`)}>
+                <FileTextIcon className="h-4 w-4" /> Instructions
+              </Button>
+            </div>
+          </PopoverContent>
+        </Popover>
+        <Button type="button" variant="ghost" size="icon" className="shrink-0" aria-label="Attach file" title="Attach file" onClick={() => fileInputRef.current?.click()}>
+          <PaperclipIcon className="h-4 w-4" />
         </Button>
         <Button type="submit" disabled={status !== "ready" || !input.trim()}>
           <SendIcon className="w-4 h-4" />
