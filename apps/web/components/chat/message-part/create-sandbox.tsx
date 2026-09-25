@@ -1,5 +1,6 @@
 import type { DataPart } from "@/ai/messages/data-parts";
-import { BoxIcon, CheckIcon, XIcon } from "lucide-react";
+import { BoxIcon, CheckIcon, SparklesIcon, XIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Spinner } from "./spinner";
 import { ToolHeader } from "../tool-header";
 import { ToolMessage } from "../tool-message";
@@ -23,11 +24,29 @@ export function CreateSandbox({ message }: Props) {
             <CheckIcon className="w-4 h-4" />
           )}
         </Spinner>
-        <span>
-          {message.status === "done" && "Sandbox created successfully"}
-          {message.status === "loading" && "Creating Sandbox"}
-          {message.status === "error" && "Failed to create sandbox"}
-        </span>
+        <div className="flex flex-wrap items-center gap-2">
+          <span>
+            {message.status === "done" && "Sandbox created successfully"}
+            {message.status === "loading" && "Creating Sandbox"}
+            {message.status === "error" && "Failed to create sandbox"}
+          </span>
+          {message.status === "error" && (
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="h-7 px-2 text-xs"
+              onClick={() => {
+                window.dispatchEvent(new CustomEvent("v0-auto-fix-request", {
+                  detail: { message: "Failed to create sandbox" },
+                }));
+              }}
+            >
+              <SparklesIcon className="h-3.5 w-3.5" />
+              Fix with AI
+            </Button>
+          )}
+        </div>
       </div>
     </ToolMessage>
   );
