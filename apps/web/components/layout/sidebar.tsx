@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageCircleIcon, GlobeIcon, FolderTreeIcon, TerminalSquareIcon } from "lucide-react";
+import { DatabaseIcon, MessageCircleIcon, GlobeIcon, FolderTreeIcon, TerminalSquareIcon, FolderKanbanIcon } from "lucide-react";
 import { useTabState } from "@/components/tabs/use-tab-state";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -10,6 +10,8 @@ const NAV_ITEMS = [
   { id: "preview", icon: GlobeIcon, label: "Preview" },
   { id: "file-explorer", icon: FolderTreeIcon, label: "Files" },
   { id: "logs", icon: TerminalSquareIcon, label: "Logs" },
+  { id: "projects", icon: FolderKanbanIcon, label: "Projects" },
+  { id: "database", icon: DatabaseIcon, label: "Database" },
 ] as const;
 
 export function Sidebar({ className }: { className?: string }) {

@@ -1,0 +1,82 @@
+{
+  "name": "language-model-chat-provider",
+  "displayName": "Language Model Chat Provider",
+  "description": "Registers an OpenAI-compatible LanguageModelChatProvider (Kilo Gateway / OpenRouter) with VS Code's language model API.",
+  "version": "0.1.0",
+  "publisher": "vibe-coding",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.104.0"
+  },
+  "categories": [
+    "AI",
+    "Other"
+  ],
+  "main": "./out/extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "languageModelChatProviders": [
+      {
+        "vendor": "vibe",
+        "displayName": "Vibe Coding"
+      }
+    ],
+    "configuration": {
+      "title": "Language Model Chat Provider",
+      "properties": {
+        "languageModelChatProvider.baseUrl": {
+          "type": "string",
+          "default": "https://api.kilo.ai/api/gateway",
+          "description": "Base URL of an OpenAI-compatible chat completions API. Use https://api.kilo.ai/api/gateway for the Kilo Gateway or https://openrouter.ai/api/v1 for OpenRouter."
+        },
+        "languageModelChatProvider.apiKey": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "API key for the chat completions API (e.g. a `KILO_API_KEY` or `OPENROUTER_API_KEY`).",
+          "editPresentation": "multilineText"
+        },
+        "languageModelChatProvider.model": {
+          "type": "string",
+          "default": "kilo-auto/free",
+          "description": "Model ID sent to the chat completions endpoint. Examples: kilo-auto/free, nvidia/nemotron-3-ultra-550b-a55b:free, openrouter/free."
+        },
+        "languageModelChatProvider.maxOutputTokens": {
+          "type": "number",
+          "default": 8192,
+          "description": "Maximum number of output tokens to request from the model.",
+          "minimum": 1
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "languageModelChatProvider.openSettings",
+        "title": "Configure Language Model",
+        "category": "Language Model Chat Provider"
+      },
+      {
+        "command": "languageModelChatProvider.test",
+        "title": "Send Test Request",
+        "category": "Language Model Chat Provider"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "watch-tests": "tsc -watch -p ./",
+    "pretest": "npm run compile",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.0",
+    "@types/node": "^20.14.0",
+    "@types/vscode": "^1.104.0",
+    "@vscode/test-electron": "^2.4.1",
+    "mocha": "^10.7.0",
+    "typescript": "^5.5.0"
+  }
+}
