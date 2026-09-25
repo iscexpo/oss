@@ -23,14 +23,32 @@ import { useSandboxStore } from "./state";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const PROMPT_FEATURES = [
-  ["Structure prompting", "Define the task, constraints, and output format."],
-  ["Few-shot examples", "Show an input and ideal output to guide the model."],
-  ["Clear delimiters", "Separate context from instructions with clear markers."],
-  ["Prompt variables", "Turn a prompt into a reusable template."],
-  ["Structured JSON", "Request predictable JSON for application workflows."],
-  ["Multimodal context", "Attach screenshots, mockups, or documents."],
-  ["Model comparison", "Try the same prompt across different models."],
-  ["Grounding and export", "Use current sources or export API-ready code."],
+  {
+    category: "Core prompt engineering",
+    items: [
+      ["Structure prompting", "Task, scope, constraints, and output format."],
+      ["System instructions", "Set roles, personas, and safety boundaries."],
+      ["Few-shot examples", "Show input-output pairs for tone and format."],
+      ["Clear delimiters", "Separate context from instructions clearly."],
+    ],
+  },
+  {
+    category: "Output optimization",
+    items: [
+      ["Structured JSON", "Enforce predictable JSON for app workflows."],
+      ["Prompt variables", "Create reusable templates with {{variables}}."],
+      ["Temperature tuning", "Lower for facts and code, higher for ideas."],
+      ["Multimodal context", "Attach screenshots, mockups, or documents."],
+    ],
+  },
+  {
+    category: "Workflow features",
+    items: [
+      ["Model comparison", "Compare variants for speed and reasoning depth."],
+      ["Google Search grounding", "Use current facts and web citations."],
+      ["Code export", "Export prompts as Python, JavaScript, cURL, or Swift."],
+    ],
+  },
 ] as const;
 
 interface Props {
@@ -135,19 +153,28 @@ export function Chat({ className }: Props) {
               <LightbulbIcon className="w-4 h-4" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent align="end" className="w-80 p-3 font-mono">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide">Suggested features</p>
-            <div className="grid gap-1">
-              {PROMPT_FEATURES.map(([title, description]) => (
-                <button
-                  key={title}
-                  type="button"
-                  className="rounded-sm px-2 py-1.5 text-left transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  onClick={() => setInput(`${title}: ${input}`)}
-                >
-                  <span className="block text-xs font-semibold">{title}</span>
-                  <span className="block text-[11px] text-muted-foreground">{description}</span>
-                </button>
+          <PopoverContent align="end" className="max-h-[min(32rem,calc(100vh-7rem))] w-80 overflow-y-auto p-3 font-mono">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wide">Suggested features</p>
+            <div className="grid gap-3">
+              {PROMPT_FEATURES.map(({ category, items }) => (
+                <section key={category} aria-labelledby={category}>
+                  <h3 id={category} className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    {category}
+                  </h3>
+                  <div className="grid gap-1">
+                    {items.map(([title, description]) => (
+                      <button
+                        key={title}
+                        type="button"
+                        className="rounded-sm px-2 py-1.5 text-left transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        onClick={() => setInput(`${title}: ${input}`)}
+                      >
+                        <span className="block text-xs font-semibold">{title}</span>
+                        <span className="block text-[11px] text-muted-foreground">{description}</span>
+                      </button>
+                    ))}
+                  </div>
+                </section>
               ))}
             </div>
           </PopoverContent>
