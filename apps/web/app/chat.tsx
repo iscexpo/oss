@@ -60,7 +60,7 @@ export function Chat({ className }: Props) {
       {/* Messages Area */}
       {messages.length === 0 ? (
         <div className="flex-1 min-h-0">
-          <div className="flex flex-col items-center justify-center h-full gap-3 px-4 font-mono text-sm text-muted-foreground">
+          <div className="flex flex-col items-center justify-center h-full gap-2 px-4 font-mono text-sm text-muted-foreground">
             <p className="font-semibold text-center">Click and try one of these prompts:</p>
             <ul className="flex flex-col w-full max-w-xl gap-1 text-center">
               {TEST_PROMPTS.map((prompt, idx) => (

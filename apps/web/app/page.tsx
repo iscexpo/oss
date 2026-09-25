@@ -3,6 +3,7 @@ import { FileExplorer } from "./file-explorer";
 import { Header } from "./header";
 import { Logs } from "./logs";
 import { Preview } from "./preview";
+import { Projects } from "./projects";
 import { Sidebar } from "@/components/layout/sidebar";
 import { TabContent, TabItem } from "@/components/tabs";
 import { Welcome } from "@/components/modals/welcome";
@@ -24,6 +25,7 @@ export default async function Page() {
           <TabItem tabId="preview">Preview</TabItem>
           <TabItem tabId="file-explorer">File Explorer</TabItem>
           <TabItem tabId="logs">Logs</TabItem>
+          <TabItem tabId="projects">Projects</TabItem>
         </ul>
 
         {/* Mobile panels (one at a time, driven by ?tab= query) */}
@@ -39,6 +41,9 @@ export default async function Page() {
           </TabContent>
           <TabContent tabId="logs" className="flex-1 h-full overflow-hidden">
             <Logs className="flex-1 overflow-hidden" />
+          </TabContent>
+          <TabContent tabId="projects" className="flex-1 h-full overflow-hidden">
+            <Projects className="flex-1 overflow-hidden" />
           </TabContent>
         </div>
 
@@ -57,6 +62,9 @@ export default async function Page() {
             </TabContent>
             <TabContent tabId="logs" className="flex-1 h-full overflow-hidden">
               <Logs className="flex-1 overflow-hidden" />
+            </TabContent>
+            <TabContent tabId="projects" className="flex-1 h-full overflow-hidden">
+              <Projects className="flex-1 overflow-hidden" />
             </TabContent>
           </div>
         </div>
