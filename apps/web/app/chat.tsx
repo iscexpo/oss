@@ -60,14 +60,22 @@ export function Chat({ className }: Props) {
       {/* Messages Area */}
       {messages.length === 0 ? (
         <div className="flex-1 min-h-0">
-          <div className="flex flex-col justify-center items-center h-full font-mono text-sm text-muted-foreground">
-            <p className="flex items-center font-semibold">Click and try one of these prompts:</p>
-            <ul className="p-4 space-y-1 text-center">
+          <div className="flex flex-col items-center justify-center h-full gap-3 px-4 font-mono text-sm text-muted-foreground">
+            <p className="font-semibold text-center">Click and try one of these prompts:</p>
+            <ul className="flex flex-col w-full max-w-xl gap-1 text-center">
               {TEST_PROMPTS.map((prompt, idx) => (
                 <li
                   key={idx}
-                  className="px-4 py-2 rounded-sm border border-dashed shadow-sm cursor-pointer border-border hover:bg-secondary/50 hover:text-primary"
+                  role="button"
+                  tabIndex={0}
+                  className="w-full px-4 py-2 border border-dashed rounded-sm shadow-sm cursor-pointer border-border hover:bg-secondary/50 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   onClick={() => validateAndSubmitMessage(prompt)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      validateAndSubmitMessage(prompt);
+                    }
+                  }}
                 >
                   {prompt}
                 </li>

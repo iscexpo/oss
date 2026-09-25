@@ -6,6 +6,7 @@ import { getRichError } from './get-rich-error'
 import { tool } from 'ai'
 import description from './create-sandbox.md'
 import { VSCODE_PORT } from '@/lib/vscode'
+import { trackSandbox } from '@/lib/sandboxes/registry'
 import z from 'zod/v3'
 
 interface Params {
@@ -40,6 +41,8 @@ export const createSandbox = ({ writer }: Params) =>
           timeout: timeout ?? 600000,
           ports: [...new Set([...(ports ?? [3000]), VSCODE_PORT])],
         })
+
+        void trackSandbox(sandbox.sandboxId)
 
         emitData(writer, toolCallId, 'create-sandbox', {
           sandboxId: sandbox.sandboxId,

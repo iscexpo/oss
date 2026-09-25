@@ -55,8 +55,9 @@ export function Welcome(props: { onDismissAction(): void; defaultOpen: boolean }
               It uses Vercel&apos;s AI Cloud services like{" "}
               <ExternalLink href="https://vercel.com/docs/vercel-sandbox">Sandbox</ExternalLink> for
               secure code execution,{" "}
-              <ExternalLink href="https://kilo.ai/docs/gateway">Kilo Gateway</ExternalLink> for
-              Claude, GPT, and Grok model support,{" "}
+              <ExternalLink href="https://kilo.ai/docs/gateway">Kilo Gateway</ExternalLink> and{" "}
+              <ExternalLink href="https://openrouter.ai/">OpenRouter</ExternalLink> for
+              Claude, GPT, Gemini, and Grok model support,{" "}
               <ExternalLink href="https://vercel.com/fluid">Fluid Compute</ExternalLink> for
               efficient rendering and streaming, and it&apos;s built with{" "}
               <ExternalLink href="https://nextjs.org/">Next.js</ExternalLink> and the{" "}
