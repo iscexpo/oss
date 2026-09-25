@@ -96,6 +96,15 @@ export function Chat({ className }: Props) {
   }, [status, setChatStatus]);
 
   useEffect(() => {
+    const onAutoFixRequest = (event: Event) => {
+      const detail = (event as CustomEvent<{ message: string }>).detail;
+      setInput(`Fix this error and explain the change:\n\n${detail.message}`);
+    };
+    window.addEventListener("v0-auto-fix-request", onAutoFixRequest);
+    return () => window.removeEventListener("v0-auto-fix-request", onAutoFixRequest);
+  }, []);
+
+  useEffect(() => {
     const onPreviewContext = (event: Event) => {
       const detail = (event as CustomEvent<{ kind: string; data: unknown }>).detail;
       setPreviewContext(JSON.stringify(detail));
