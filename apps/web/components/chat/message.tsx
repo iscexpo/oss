@@ -40,6 +40,8 @@ export const Message = memo(function Message({ message }: Props) {
         className={cn({
           "mr-20": message.role === "assistant",
           "ml-20": message.role === "user",
+          "rounded-lg": true,
+          "border-l-2 border-cyan-400/70 pl-3": message.role === "assistant",
         })}
       >
         {/* Message Header */}

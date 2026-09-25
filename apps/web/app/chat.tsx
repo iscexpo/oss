@@ -153,7 +153,7 @@ export function Chat({ className }: Props) {
         </div>
       ) : (
         <Conversation className="relative w-full">
-          <ConversationContent className="space-y-4">
+          <ConversationContent className="space-y-6 px-4 py-5 md:px-6">
             {messages.map((message) => (
               <Message key={message.id} message={message} />
             ))}
